@@ -12,8 +12,8 @@ TODO
 
 races: Spheros, Rabbibunnies, Quetches, Grobos
 """
-from curses import wrapper, newwin
-import curses
+# import curses
+from bearlibterminal import terminal as blt
 import os
 import sys
 from copy import copy, deepcopy
@@ -23,6 +23,8 @@ from collections import defaultdict
 from textwrap import wrap
 import string
 import shelve
+
+oprint = print
 
 __version__ = (0,3,0)
 
@@ -49,35 +51,144 @@ class ObjectsByAttr:
 obj_by_attr = ObjectsByAttr()
 
 
+class OLD__Blocks:
+
+    angled1 = '╱'
+    angled2 = '╲'
+    antitank = '⋇'
+
+    bars = '┇'
+    bell = '🔔'
+    block1 = '▐'
+    # books = '\ue93a'
+    books = '📚'
+    bottle = '\uea86'
+    box1 = '⊟'
+
+    cactus = '\ue9e6'
+    car = '⎌'
+    chair = '⑁'
+    coin = '⌾'
+    computer = '💻'
+    cow = '\uea32'      # actually lion
+    crate1 = '◧'
+    crate2 = '◨'
+    crate3 = '◩'
+    crate4 = '◪'
+    cupboard = '⌸'
+    dock_boards = '≂'
+    door = '⊓'
+    dynofly = '\ueaeb'
+    elephant = '\ue9b7'     # Grobo, fairy icon but looks a bit like elephant face in small size
+    ferry = '⏅'
+    ferry_ticket = 't'
+    fireplace = '⩟'
+    flag = '\ue938'     # jolly roger
+    flute = '|'
+    fountain = '⋓'
+    funfrock = '\uea47'
+    grill = '▒'
+    grn_heart = '\ue9fa'
+    guardrail_l = '╔'
+    guardrail_m = '╤'
+    guardrail_r = '╕'
+    hair_dryer = 'D'
+    hexagon = '⎔'
+    honey = '🍯'
+    horn = '\uea04'
+    key = '\uea15'
+    ladder = '☰'
+    lever = '⎆'
+    locker = '⊞'
+    magic_ball = '❂'
+    medallion = '◉'
+    monkey = '\ue9d5'   # actually fox
+    open_book = '\ue93a'
+    platform = '▁'
+    platform2 = '▭'
+    platform_top = '▔'
+    pod = '≃'
+    proto_pack = 'P'
+    rabbit = '\uea76'
+    rock2 = '▧'
+    rock3 = '▓'
+    rubbish = '♽'
+    runes = '⩰'
+    saber = '\uea19'
+    safe = '⊡'
+    seal = '⏣'
+    sharp_rock = '⩕'
+    shelves = '⊞'
+    small_table = '▿'
+    smoke_pipe = '⧚'
+    snowflake = '\ueaa7'
+    snowman = '☃'
+    soldier = '⍾'
+    special_stone = '⏢'
+    statue = 'Ω'
+    steering_wheel = '⎈'
+    steps_l = '▚'
+    steps_r = '▞'
+    stool = '⍑'
+    sunflower = '🌻' # unused
+    table2 = '⍡'
+    ticket_seller = '⌂'
+    tree1 = '\uea62'
+    tree2 = '\ue98b'
+    truck = '⎌'
+    tulip = '\ue98a'    # actually daisy
+    underline = '▁'
+    water = '\ue90b'
+    wine = '🍷'
+    zoe = '\uea6f'
+
+    books = '📚'
+    open_book = '📖'
+    cactus = '🌵'
+    car = '🚗'
+    coin = '🌕'
+    cow = '🐮'
+    elephant = '🐘'     # Grobo
+    ferry = '🚤'
+    flag = '▶'
+    horn = '📯'
+    key = '🔑'
+    monkey = '🐵'
+    rabbit = '🐰'
+    rock2 = '║'
+    tree1 = '🌲'
+    tree2 = '🌳'
+    tulip = '🌷'
+    zoe = '👩'
+
+    crates = (crate1, crate2, crate3, crate4)
+
 class Blocks:
     platform = '▁'
     bell = '🔔'
     grill = '▒'
     rubbish = '♽'
-    # truck = '🚚'
-    truck = '⎌'
-    locker = '⊞'
-    grn_heart = '\ue9fa'
-    # coin = '🌕'
-    coin = '⌾'
-    # key = '🔑'
-    key = '\uea15'
-    door = '⊓'
+    truck = '🚚'
+    locker = '🔲'
+    grn_heart = '💚'
+    coin = '🌕'
+    key = '🔑'
+    door = '🚪'
     block1 = '▐'
     steps_r = '▞'
     steps_l = '▚'
     platform_top = '▔'
     ladder = '☰'
     honey = '🍯'
-    shelves = '⊞'
+    shelves = '☷'
     chair = '⑁'
-    fountain = '⋓'
+    fountain = '‿'
     small_table = '▿'
     table2 = '⍡'
     stool = '⍑'
     underline = '▁'
     cupboard = '⌸'
-    sunflower = '🌻' # unused
+    sunflower = '🌻'
     magic_ball = '❂'
     crate1 = '◧'
     crate2 = '◨'
@@ -85,78 +196,66 @@ class Blocks:
     crate4 = '◪'
     smoke_pipe = '⧚'
     fireplace = '⩟'
-    water = '\ue90b'
-    # elephant = '🐘'     # Grobo
-    elephant = '\ue9b7'     # Grobo, fairy icon but looks a bit like elephant face in small size
-    # rabbit = '🐰'
-    rabbit = '\uea76'
+    water = '⏖'
+    elephant = '🐘'     # Grobo
+    rabbit = '🐰'
     wine = '🍷'
-    dock_boards = '≂'
+    dock_boards = '⏔'
     ticket_seller = '⌂'
-    # ferry = '🚤'
-    ferry = '⏅'
+    ferry = '🚤'
     ferry_ticket = 't'
     soldier = '⍾'
     bars = '┇'
-    # tree1 = '🌲'
-    # tree2 = '🌳'
-    tree1 = '\uea62'
-    tree2 = '\ue98b'
-    # books = '📚'
-    # open_book = '📖'
-    books = '\ue93a'
-    open_book = '\ue93a'
+    tree1 = '🌲'
+    tree2 = '🌳'
+    books = '📚'
+    open_book = '📖'
     guardrail_l = '╔'
     guardrail_r = '╕'
     guardrail_m = '╤'
-    # tulip = '🌷'
-    tulip = '\ue98a'    # actually daisy
-    # monkey = '🐵'
-    monkey = '\ue9d5'   # actually fox
+    tulip = '🌷'
+    monkey = '🐵'
     antitank = '⋇'
+    red_circle = '🔴'
     # rock2 = '║'
     rock2 = '▧'
     rock3 = '▓'
     platform2 = '▭'
     angled1 = '╱'
     angled2 = '╲'
+    picture = '🖼'
     hexagon = '⎔'
-    # car = '🚗'
-    car = '⎌'
-    bottle = '\uea86'
+    car = '🚗'
+    blue_round = '🔵' # unused
+    bottle = '℧'
     box1 = '⊟'
-    # cactus = '🌵'
-    cactus = '\ue9e6'
+    cactus = '🌵'
     lever = '⎆'
     statue = 'Ω'
     sharp_rock = '⩕'
     runes = '⩰'
-    # cow = '🐮'
-    cow = '\uea32'      # actually lion
+    cow = '🐮'
     hair_dryer = 'D'
     proto_pack = 'P'
-    # flag = '▶'
-    flag = '\ue938'     # jolly roger
+    flag = '▶'
     steering_wheel = '⎈'
-    # horn = '📯'
-    horn = '\uea04'
+    horn = '📯'
     medallion = '◉'
     seal = '⏣'
     special_stone = '⏢'
-    flute = '|'
+    flute = 'f'
     snowman = '☃'
-    snowflake = '\ueaa7'
-    dynofly = '\ueaeb'
+    snowflake = '❄'
+    dynofly = 'D'
     safe = '⊡'
-    saber = '\uea19'
+    saber = ')'
     pod = '≃'
     computer = '💻'
     # zoe = '👩'
-    zoe = '\uea6f'
-    funfrock = '\uea47'
+    zoe = 'Z'
+    funfrock = 'F'
 
     crates = (crate1, crate2, crate3, crate4)
-
 
 class Stance:
     normal = 1
@@ -559,6 +658,7 @@ class Board:
         self.guards = [g]
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill1)
         p = Player(self, specials[3], id=ID.player)
+        print("p.char", p.char)
         Item(self, rock, '', specials[4], id=ID.stone3, type=Type.blocking)
         return p
 
@@ -897,7 +997,7 @@ class Board:
                     elif char==Blocks.ladder:
                         Item(self, Blocks.ladder, 'ladder', loc, type=Type.ladder)
 
-                    elif char=='d':
+                    elif char==Blocks.door:
                         d = Item(self, Blocks.door, 'door', loc, type=Type.door1)
                         doors.append(d)
 
@@ -1062,6 +1162,8 @@ class Board:
         return any(get_obj(x).type==type for x in self.get_all_obj(loc))
 
     def draw(self, win):
+        blt.clear()
+        blt.color("white")
         for y, row in enumerate(self.B):
             for x, cell in enumerate(row):
                 # tricky bug: if an 'invisible' item put somewhere, then a being moves on top of it, it's drawn, but
@@ -1071,14 +1173,18 @@ class Board:
                 a = last(cell)
                 if isinstance(a, int):
                     a = objects[a]
-                win.addstr(y,x, str(a))
+                Windows.win.addstr(y,x, str(a))
+                # Windows.win.addstr(y,x, a)
         for y,x,txt in self.labels:
-            win.addstr(y,x,txt)
-        for loc, col in self.colors:
-            win.addstr(loc.y, loc.x, str(self[loc]), curses.color_pair(col))
-        win.refresh()
-        if Windows.win2:
-            Windows.win2.addstr(0,74, str(self._map))
+            Windows.win.addstr(y,x,txt)
+        # for loc, col in self.colors:
+            # win.addstr(loc.y, loc.x, str(self[loc]), curses.color_pair(col))
+        for n, l in enumerate(Misc.status):
+            Windows.win2.addstr(n+1, 0, l)
+        Misc.status = []
+        Windows.win2.addstr(0,74, str(self._map))
+        Windows.win2.addstr(0,0, Misc.stats)
+        Windows.refresh()
 
     def put(self, obj, loc=None):
         """
@@ -1122,11 +1228,11 @@ class Board:
 
     def display(self, txt):
         w = max(len(l) for l in txt) + 1
-        win = newwin(len(txt)+2, w+2, 5, 5)
+        X,Y = 5, 5
         for y, ln in enumerate(txt):
-            win.addstr(y+1,0, ' ' + ln)
-        win.getkey()
-        del win
+            Windows.win.addstr(Y+y+1, X, ' ' + ln)
+        Windows.refresh()
+        blt.read()
 
 def chk_oob(loc, y=0, x=0):
     return 0 <= loc.y+y <= HEIGHT-1 and 0 <= loc.x+x <= 78
@@ -1320,42 +1426,36 @@ class Being(BeingItemMixin):
             offset_y = lines if loc.y<8 else -lines
 
             y = max(0, loc.y+offset_y)
-            win = newwin(lines+2, w+2, y, x)
-            win.addstr(1,1, txt + (' [Y/N]' if yesno else ''))
+            Windows.win.addstr(x+1,y+1, txt + (' [Y/N]' if yesno else ''))
 
             if yesno:
                 # TODO in some one-time dialogs, may need to detect 'no' explicitly
-                k = win.getkey()
-                del win
+                k = parsekey(blt.read())
                 return k in 'Yy'
 
             elif multichoice:
                 for _ in range(2):
-                    k = win.getkey()
+                    k = parsekey(blt.read())
                     try:
                         k=int(k)
                     except ValueError:
                         k = 0
                     if k in range(1, multichoice+1):
-                        del win
                         return k
 
             if resp and m==len(dialog)-1:
                 i=''
                 for _ in range(10):
-                    k=win.getkey()
-                    if k=='\n': break
+                    k = parsekey(blt.read())
+                    if k==' ': break
                     i+=k
-                    status(i)
-                    Windows.win2.refresh()
-                del win
+                    Misc.status.append(i)
+                    Windows.refresh()
                 return i
 
-            win.getkey()
-            del win
+            Windows.refresh()
+            blt.read()
             self.B.draw(Windows.win)
-            Windows.win2.clear()
-            Windows.win2.refresh()
 
     def _move(self, dir, fly=False):
         m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0))[dir]
@@ -1470,7 +1570,7 @@ class Being(BeingItemMixin):
                 if x==4:
                     B.state=1
 
-            Windows.win2.refresh()
+            Windows.refresh()
             return True, True
         return None, None
 
@@ -1567,7 +1667,7 @@ class Being(BeingItemMixin):
                     # ugly hack for the fall animation
                     Windows.win.addstr(new2.y, new2.x, str(self))
                     sleep(0.05)
-                    Windows.win.refresh()
+                    Windows.refresh()
                     new = new2
                 else:
                     break
@@ -2072,13 +2172,17 @@ class Being(BeingItemMixin):
                 status("Looks like you don't have enough kashes!")
 
     def use(self):
+        if not self.inv:
+            return
         B=self.B
-        win = newwin(len(self.inv), 40, 2, 10)
         ascii_letters = string.ascii_letters
+        x = 10
+        y = 2
+
         for n, (id,qty) in enumerate(self.inv.items()):
             item = objects[id]
-            win.addstr(n,0, f' {ascii_letters[n]}) {item.name:4} - {qty} ')
-        ch = win.getkey()
+            Windows.win.addstr(y+n, x, f' {ascii_letters[n]}) {item.name:4} - {qty} ')
+        ch = parsekey(blt.read())
         item_id = None
         if ch in ascii_letters:
             try:
@@ -2129,6 +2233,7 @@ class Being(BeingItemMixin):
             obj.clermont_ferrand.state = 2
         else:
             status('Nothing happens')
+        Windows.refresh()
 
     def get_top_item(self):
         x = self.B[self.loc]
@@ -2166,10 +2271,11 @@ def last(x):
     return x[-1] if x else None
 
 def pdb(*arg):
-    curses.nocbreak()
-    Windows.win.keypad(0)
-    curses.echo()
-    curses.endwin()
+    pass
+    # curses.nocbreak()
+    # Windows.win.keypad(0)
+    # curses.echo()
+    # curses.endwin()
     import pdb; pdb.set_trace()
 
 class Event:
@@ -2220,6 +2326,7 @@ class JailEvent(Event):
             JailEvent.once = True
 
 def status(msg):
+    Misc.status.append(msg)
     Windows.win2.addstr(2,0,msg)
 
 class RoboCloneAppearEvent(Event):
@@ -2259,7 +2366,7 @@ class DrFunfrockTrapEvent(Event):
         pl.talk(pl, "As you are about to reach the iron bars and set Zoe free, a cage drops around you. ")
         Item(B, Blocks.bars, 'bars', pl.loc.mod_l())
         Item(B, Blocks.bars, 'bars', pl.loc.mod_r())
-        Windows.win.refresh()
+        Windows.refresh()
         pl.talk(pl, conversations[ID.funfrock])
         B = map_to_board('1')
         B.containers[0].inv = pl.inv
@@ -2588,8 +2695,12 @@ class Timer:
         self.turns, self.evt = turns, evt
 
 class Player(Being):
-    # char = '🙍'
-    char = '\uea6f'
+    # char = '\uea6f'
+    char = '🙍'
+    char = 0xf183
+    # char = '[U+f183]'.format(hex(0xf183)[2:])
+    char = '[U+{}]'.format(hex(0xf183+300)[2:])
+    print("char", char)
     health = 10
     is_player = 1
     stance = Stance.sneaky
@@ -2618,10 +2729,29 @@ class ShopKeeper(Being):
 class Grobo(Being):
     char = Blocks.elephant
 
+
+class Win1:
+    @staticmethod
+    def addstr(y,x, text):
+        blt.puts(x, y, text)
+
+class Win2:
+    @staticmethod
+    def addstr(y,x, text):
+        blt.puts(x, y+16, text)
+
 class Windows:
-    win = win2 = None
+    win = Win1
+    win2 = Win2
+
+    @staticmethod
+    def refresh():
+        blt.refresh()
+
+
 class Misc:
-    pass
+    status = []
+    stats = ''
 
 class Saves:
     saves = {}
@@ -2684,20 +2814,73 @@ class Colors:
     yellow_on_black = 4
     blue_on_black = 5
 
-def main(stdscr, load_game):
+def main(load_game):
+    """
+    key f084
+    flag f024
+    computer f109
+    twig f18c
+    musical note f001
+    girl f182
+    cabinet? f0db
+    bell f0f3
+    man f183
+    truck f0d1
+    seal? f192, f140
+    robot f17b
+    file box f187
+    garbage can f014
+    book f02d
+    stairs f039, f0c9
+    coin? f111
+    bars f142
+    """
+    blt.open()
+    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: Andale.ttf, size=24")
+    blt.set("sm font: Andale.ttf, size=8x12, spacing=1x1")
+    blt.color("white")
+    blt.composition(True)
+    # blt.set("U+E200: Tiles.png, size=24x24, align=top-left")
+    blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
+    # blt.set("U+E300: ../Media/fontawesome-webfont.ttf, size=24x24, spacing=3x2, codepage=../Media/fontawesome-codepage.txt")
+    blt.clear()
+    blt.color("white")
+    x = 0xe300
+        # oprint(n, 1+5*n%80, 5*n//80, x+n)
+
+    z=1
+    sw=1
+    with open('fontawesome-codepage.txt') as fp:
+        codes = fp.readlines()
+    while z:
+        wd = 120
+        for n in range(460):
+            blt.put(1+10*n%wd, 10*n//wd, x+n)
+            blt.puts(1+10*n%wd + 2, 10*n//wd, '[font=sm]{}[/font]'.format(codes[n]))
+        blt.refresh()
+
+        z = blt.read()
+        blt.clear()
+        sw = not sw
+        if z in ('q', blt.TK_CLOSE, blt.TK_ESCAPE):
+            return
+
     if not os.path.exists('saves'):
         os.mkdir('saves')
     Misc.is_game = 1
-    curses.init_pair(Colors.blue_on_white, curses.COLOR_BLUE, curses.COLOR_WHITE)
-    curses.init_pair(Colors.yellow_on_white, curses.COLOR_YELLOW, curses.COLOR_WHITE)
-    curses.init_pair(Colors.green_on_white, curses.COLOR_GREEN, curses.COLOR_WHITE)
-    curses.init_pair(Colors.yellow_on_black, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-    curses.init_pair(Colors.blue_on_black, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    # curses.init_pair(Colors.blue_on_white, curses.COLOR_BLUE, curses.COLOR_WHITE)
+    # curses.init_pair(Colors.yellow_on_white, curses.COLOR_YELLOW, curses.COLOR_WHITE)
+    # curses.init_pair(Colors.green_on_white, curses.COLOR_GREEN, curses.COLOR_WHITE)
+    # curses.init_pair(Colors.yellow_on_black, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    # curses.init_pair(Colors.blue_on_black, curses.COLOR_BLUE, curses.COLOR_BLACK)
 
-    begin_x = 0; begin_y = 0; width = 80
-    win = Windows.win = newwin(HEIGHT, width, begin_y, begin_x)
-    begin_x = 0; begin_y = 16; height = 6; width = 80
-    win2 = Windows.win2 = newwin(height, width, begin_y, begin_x)
+    # begin_x = 0; begin_y = 0; width = 80
+    win = Windows.win
+    # begin_x = 0; begin_y = 16; height = 6; width = 80
+    win2 = Windows.win2
+
+    # win2.addstr(2,0, 'TEST')
+    # status('TEST')
 
     # generatable items
     coin = Item(None, Blocks.coin, 'coin', id=ID.coin)
@@ -2868,11 +3051,11 @@ def main(stdscr, load_game):
          [und1,  sea1,       landscape1, wtower, beluga, elf_lab, mstone2, brundle, None,None, None, None],
     )
 
-    stdscr.clear()
+    # stdscr.clear()
     B.draw(win)
 
     win2.addstr(0, 0, '-'*80)
-    win2.refresh()
+    Windows.refresh()
 
     Saves().save(B.loc, 'start')
     Misc.last_cmd = None
@@ -2909,17 +3092,80 @@ def main(stdscr, load_game):
 
     while 1:
         rv = handle_ui(B, player)
-        if not rv: return
+        if not rv: break
+        if rv==1: continue
         B, player = rv
+    blt.set("U+E100: none; U+E200: none; U+E300: none; zodiac font: none")
+    blt.composition(False)
+    blt.close()
 
+keymap = dict(
+    [
+    [ blt.TK_SHIFT, 'SHIFT' ],
+    [ blt.TK_RETURN, '\n' ],
+    [ blt.TK_PERIOD, "." ],
+
+    [ blt.TK_Q, 'q' ],
+    [ blt.TK_W, 'w' ],
+    [ blt.TK_E, 'e' ],
+    [ blt.TK_R, 'r' ],
+    [ blt.TK_T, 't' ],
+    [ blt.TK_Y, 'y' ],
+    [ blt.TK_U, 'u' ],
+    [ blt.TK_I, 'i' ],
+    [ blt.TK_O, 'o' ],
+    [ blt.TK_P, 'p' ],
+    [ blt.TK_A, 'a' ],
+    [ blt.TK_S, 's' ],
+    [ blt.TK_D, 'd' ],
+    [ blt.TK_F, 'f' ],
+    [ blt.TK_G, 'g' ],
+    [ blt.TK_H, 'h' ],
+    [ blt.TK_J, 'j' ],
+    [ blt.TK_K, 'k' ],
+    [ blt.TK_L, 'l' ],
+    [ blt.TK_Z, 'z' ],
+    [ blt.TK_X, 'x' ],
+    [ blt.TK_C, 'c' ],
+    [ blt.TK_V, 'v' ],
+    [ blt.TK_B, 'b' ],
+    [ blt.TK_N, 'n' ],
+    [ blt.TK_M, 'm' ],
+
+    [ blt.TK_1, '1' ],
+    [ blt.TK_2, '2' ],
+    [ blt.TK_3, '3' ],
+    [ blt.TK_4, '4' ],
+    [ blt.TK_5, '5' ],
+    [ blt.TK_6, '6' ],
+    [ blt.TK_7, '7' ],
+    [ blt.TK_8, '8' ],
+    [ blt.TK_9, '9' ],
+    [ blt.TK_0, '0' ],
+
+    [ blt.TK_COMMA, ',' ],
+    [ blt.TK_SPACE, ' ' ],
+    ]
+    )
+
+def parsekey(k):
+    if blt.check(blt.TK_WCHAR) or k==blt.TK_RETURN:
+        return keymap.get(k)
 
 def handle_ui(B, player):
     win, win2 = Windows.win, Windows.win2
-    k = win.getkey()
-    win2.clear()
+    k = parsekey(blt.read())
+    print("k", k)
+    if k and blt.state(blt.TK_SHIFT):
+        k = k.upper()
+
+    # win2.clear()
     win2.addstr(1,0, ' '*78)
-    win2.addstr(2,0,k)
-    if k=='q':
+    # if k:
+        # win2.addstr(2,0,k)
+    if not k:
+        return 1
+    if k in ('q', blt.TK_CLOSE, blt.TK_ESCAPE):
         return
     elif k=='f':
         player.stance = Stance.fight
@@ -2975,7 +3221,7 @@ def handle_ui(B, player):
         name = prompt(win2)
         Saves().save(B.loc, name)
         status(f'Saved game as "{name}"')
-        Windows.win2.refresh()
+        Windows.refresh()
     elif k == 'S':
         player.stance = Stance.sneaky
         win2.addstr(1, 0, 'stance: sneaky')
@@ -2983,14 +3229,17 @@ def handle_ui(B, player):
         status(str(player.loc))
     elif k == ' ':
         player.action()
+
     elif k == '4' and DBG:
         mp = ''
         status('> ')
-        win2.refresh()
+        Windows.refresh()
         while 1:
-            mp += win.getkey()
+            k = parsekey(blt.read())
+            if not k: break
+            mp += k
             status('> '+mp)
-            win2.refresh()
+            Windows.refresh()
             if mp in map_to_loc:
                 B = player.move_to_board(mp, loc=Loc(40, 5))
                 if B._map=='des_und': player.tele(Loc(7,7))
@@ -2998,22 +3247,27 @@ def handle_ui(B, player):
                 if B._map=='des_und2': player.tele(Loc(70,7))
             if not any(m.startswith(mp) for m in map_to_loc):
                 break
+
     elif k == '5' and DBG:
-        k = win.getkey()
-        k+= win.getkey()
-        try:
-            print(B.B[int(k)])
-            status(f'printed row {k} to debug')
-        except:
-            status('try again')
+        k = parsekey(blt.read())
+        k2 = parsekey(blt.read())
+        if k and k2:
+            try:
+                print(B.B[int(k+k2)])
+                status(f'printed row {k+k2} to debug')
+            except:
+                status('try again')
+
     elif k == 't' and DBG:
         # debug teleport
-        k = ''
+        mp = ''
         while 1:
-            k+=win.getkey()
+            k = parsekey(blt.read())
+            if not k: break
+            mp+=k
             status(k)
-            win2.refresh()
-            if k.endswith(' '):
+            Windows.refresh()
+            if mp.endswith(' '):
                 try:
                     x,y=k[:-1].split(',')
                     player.tele(Loc(int(x), int(y)))
@@ -3037,7 +3291,7 @@ def handle_ui(B, player):
             item = objects[id]
             if item and n:
                 txt.append(f'{item.name} {n}')
-        B.display(txt)
+        B.display(txt or ['Inventory is empty'])
 
     if k != '.':
         Misc.wait_count = 0
@@ -3087,22 +3341,22 @@ def handle_ui(B, player):
             triggered_events.append(t.evt)
     timers[:] = [t for t in timers if t.turns>0]
     B.draw(win)
-    key = '[key]' if player.has(ID.key1) else ''
-    win2.addstr(0,0, f'[{STANCES[player.stance]}] [H{player.health}] [{player.kashes} Kashes] {key}')
-    win2.refresh()
+    key = '(key)' if player.has(ID.key1) else ''
+    Misc.stats = f'({STANCES[player.stance]}) (H{player.health}) ({player.kashes} Kashes) {key}'
+    Windows.refresh()
     return B, player
 
 def prompt(win2):
     mp = ''
     status('> ')
-    win2.refresh()
+    Windows.refresh()
     while 1:
-        k = win2.getkey()
+        k = parsekey(blt.read())
         if k=='\n':
             return mp
         mp += k
         status('> '+mp)
-        win2.refresh()
+        Windows.refresh()
 
 
 def debug(*args):
@@ -3110,12 +3364,9 @@ def debug(*args):
     debug_log.flush()
 print=debug
 
-def editor(stdscr, _map):
+def editor(_map):
     Misc.is_game = 0
-    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_WHITE)
     begin_x = 0; begin_y = 0; width = 80
-    win = newwin(HEIGHT, width, begin_y, begin_x)
-    curses.curs_set(True)
     loc = Loc(40, 8)
     brush = None
     written = 0
@@ -3126,10 +3377,10 @@ def editor(stdscr, _map):
             for _ in range(HEIGHT):
                 fp.write(blank*78 + '\n')
     B.load_map(_map, 1)
-    B.draw(win)
+    B.draw(None)
 
     while 1:
-        k = win.getkey()
+        k = parsekey(blt.read())
         if k=='Q': return
         elif k in 'hjklyubnHL':
             n = 1
@@ -3216,7 +3467,9 @@ def editor(stdscr, _map):
             cmd = ''
             BL=Blocks
             while 1:
-                cmd += win.getkey()
+                k = parsekey(blt.read())
+                if k:
+                    cmd += k
                 if   cmd == 'gm': B.put(BL.guardrail_m, loc)
                 elif cmd == 'gl': B.put(BL.guardrail_l, loc)
                 elif cmd == 'gr': B.put(BL.guardrail_r, loc)
@@ -3244,7 +3497,7 @@ def editor(stdscr, _map):
 
         elif k in 'E':
             win.addstr(2,2, 'Are you sure you want to clear the map? [Y/N]')
-            y = win.getkey()
+            y = parsekey(blt.read())
             if y=='Y':
                 for row in B.B:
                     for cell in row:
@@ -3285,6 +3538,8 @@ if __name__ == "__main__":
     if a and a.startswith('-l'):
         load_game = a[2:]
     if first(argv) == 'ed':
-        wrapper(editor, argv[1])
+        editor(argv[1])
+        # wrapper(editor, argv[1])
     else:
-        wrapper(main, load_game)
+        main(load_game)
+        # wrapper(main, load_game)
