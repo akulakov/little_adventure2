@@ -1508,13 +1508,21 @@ class Being(BeingItemMixin):
             w = 78 - x
             lines = (len(txt) // w) + 4
             txt = wrap(txt, w)
+            xsz = max(len(l) for l in txt)
+            ysz = len(txt)
             txt = '\n'.join(txt)
             offset_y = lines if loc.y<8 else -lines
 
             y = max(0, loc.y+offset_y)
-            # print('addstr:', x+1,y+1, txt + (' [Y/N]' if yesno else ''))
-            # Windows.win.addstr(5,5, 'TEST dialog\nline 2 test')
-            Windows.win.addstr(y+1,x+1, txt + (' [Y/N]' if yesno else ''))
+            _txt = txt + (' [Y/N]' if yesno else '')
+            # bg = blank * (len(txt) + 2)
+            print('clear area', x, y, xsz, ysz)
+            blt.clear_area(x+1, y+1, xsz, ysz)
+            # blt.clear_area(0, 0, 78, 16)
+            # blt.layer(1)
+            # Windows.win.addstr(y+1,x+1, ' [bkcolor=black]' + bgtxt + blank*6 + '[/color] ')
+            Windows.win.addstr(y+1,x+1, ' [bkcolor=black]' + txt + (' [Y/N]' if yesno else '') + '[/bkcolor] ')
+            # blt.layer(0)
 
             if yesno:
                 # TODO in some one-time dialogs, may need to detect 'no' explicitly
