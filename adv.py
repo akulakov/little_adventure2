@@ -233,6 +233,11 @@ water2
 rock
 heart
 white-sq
+libra
+block1
+slash
+alarm
+rubbish
 """.split()
 gnu_tiles = {k: 0xe400+n for n,k in enumerate(gnu_tiles)}
 # print("gnu_tiles", gnu_tiles)
@@ -243,14 +248,14 @@ class Blocks:
     lever = '-'
     shelves = gnu_tiles['shelves']
     ladder = gnu_tiles['ladder']
-    platform2 = '_'
+    platform2 = gnu_tiles['block1']
     platform_top = gnu_tiles['top-platform']
     rock2 = gnu_tiles['white-sq']
 
     platform = '▁'
-    bell = '🔔'
+    bell = gnu_tiles['alarm']
     grill = gnu_tiles['grill1']
-    rubbish = '♽'
+    rubbish = gnu_tiles['rubbish']
     truck = noto_tiles['truck']
     locker = gnu_tiles['cabinet']
     grn_heart = gnu_tiles['heart'] # 2665
@@ -308,7 +313,7 @@ class Blocks:
 
     statue = gnu_tiles['statue']
     sharp_rock = noto_tiles['sharp-rock1']
-    runes = gnu_tiles['shelves']
+    runes = gnu_tiles['libra']
     cow = noto_tiles['cow']
     hair_dryer = 'D'
     proto_pack = 'P'
@@ -1273,12 +1278,15 @@ class Board:
             Windows.win.addstr(y,x,txt)
         # for loc, col in self.colors:
             # win.addstr(loc.y, loc.x, str(self[loc]), curses.color_pair(col))
-        for n, l in enumerate(Misc.status):
-            Windows.win2.addstr(n+1, 0, l)
+        self.display_status()
         Misc.status = []
         Windows.win2.addstr(0,74, str(self._map))
         Windows.win2.addstr(0,0, Misc.stats)
         Windows.refresh()
+
+    def display_status(self):
+        for n, l in enumerate(Misc.status):
+            Windows.win2.addstr(n+1, 0, l)
 
     def put(self, obj, loc=None):
         """
@@ -1524,6 +1532,7 @@ class Being(BeingItemMixin):
             xsz = max(len(l) for l in txt_lines)
             blt.clear_area(x+1, y+1, xsz, len(txt_lines))
             Windows.win.addstr(y+1,x+1, txt + (' [Y/N]' if yesno else ''))
+            Windows.refresh()
 
             if yesno:
                 # TODO in some one-time dialogs, may need to detect 'no' explicitly
@@ -1531,7 +1540,6 @@ class Being(BeingItemMixin):
                 return k in 'Yy'
 
             elif multichoice:
-                Windows.refresh()
                 for _ in range(2):
                     k = parsekey(blt.read())
                     try:
@@ -3148,7 +3156,7 @@ def main(load_game):
     Item(None, Blocks.magic_ball,'magic ball', id=ID.magic_ball)
     Item(None, 'c','blue card', id=ID.blue_card)
     Item(None, 'p','architect_pass', id=ID.architect_pass)
-    Item(None, Blocks.bottle1, 'jar of raspberry syrup', id=ID.jar_syrup)
+    Item(None, Blocks.bottle, 'jar of raspberry syrup', id=ID.jar_syrup)
     Item(None, Blocks.wine, 'half bottle of wine', id=ID.wine)
     # Item(None, Blocks.crate1, 'crate', id=ID.crate1)
     Item(None, Blocks.bottle, 'Bottle of clear water', id=ID.bottle_clear_water)
@@ -3241,15 +3249,18 @@ def handle_ui(B, player):
         return
     elif k=='f':
         player.stance = Stance.fight
-        win2.addstr(1, 0, 'stance: fight')
+        # win2.addstr(1, 0, 'stance: fight')
+        B.display_status()
         Windows.refresh()
     elif k=='n':
         player.stance = Stance.normal
-        win2.addstr(1, 0, 'stance: normal')
+        # win2.addstr(1, 0, 'stance: normal')
+        B.display_status()
         Windows.refresh()
     elif k == 'S':
         player.stance = Stance.sneaky
-        win2.addstr(1, 0, 'stance: sneaky')
+        # win2.addstr(1, 0, 'stance: sneaky')
+        B.display_status()
         Windows.refresh()
 
     elif k in 'hjklHL':
