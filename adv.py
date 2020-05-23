@@ -51,119 +51,8 @@ class ObjectsByAttr:
 obj_by_attr = ObjectsByAttr()
 
 
-class OLD__Blocks:
+class OLDBlocks:
 
-    angled1 = '╱'
-    angled2 = '╲'
-    antitank = '⋇'
-
-    bars = '┇'
-    bell = '🔔'
-    block1 = '▐'
-    # books = '\ue93a'
-    books = '📚'
-    bottle = '\uea86'
-    box1 = '⊟'
-
-    cactus = '\ue9e6'
-    car = '⎌'
-    chair = '⑁'
-    coin = '⌾'
-    computer = '💻'
-    cow = '\uea32'      # actually lion
-    crate1 = '◧'
-    crate2 = '◨'
-    crate3 = '◩'
-    crate4 = '◪'
-    cupboard = '⌸'
-    dock_boards = '≂'
-    door = '⊓'
-    dynofly = '\ueaeb'
-    elephant = '\ue9b7'     # Grobo, fairy icon but looks a bit like elephant face in small size
-    ferry = '⏅'
-    ferry_ticket = 't'
-    fireplace = '⩟'
-    flag = '\ue938'     # jolly roger
-    flute = '|'
-    fountain = '⋓'
-    funfrock = '\uea47'
-    grill = '▒'
-    grn_heart = '\ue9fa'
-    guardrail_l = '╔'
-    guardrail_m = '╤'
-    guardrail_r = '╕'
-    hair_dryer = 'D'
-    hexagon = '⎔'
-    honey = '🍯'
-    horn = '\uea04'
-    key = '\uea15'
-    ladder = '☰'
-    lever = '⎆'
-    locker = '⊞'
-    magic_ball = '❂'
-    medallion = '◉'
-    monkey = '\ue9d5'   # actually fox
-    open_book = '\ue93a'
-    platform = '▁'
-    platform2 = '▭'
-    platform_top = '▔'
-    pod = '≃'
-    proto_pack = 'P'
-    rabbit = '\uea76'
-    rock2 = '▧'
-    rock3 = '▓'
-    rubbish = '♽'
-    runes = '⩰'
-    saber = '\uea19'
-    safe = '⊡'
-    seal = '⏣'
-    sharp_rock = '⩕'
-    shelves = '⊞'
-    small_table = '▿'
-    smoke_pipe = '⧚'
-    snowflake = '\ueaa7'
-    snowman = '☃'
-    soldier = '⍾'
-    special_stone = '⏢'
-    statue = 'Ω'
-    steering_wheel = '⎈'
-    steps_l = '▚'
-    steps_r = '▞'
-    stool = '⍑'
-    sunflower = '🌻' # unused
-    table2 = '⍡'
-    ticket_seller = '⌂'
-    tree1 = '\uea62'
-    tree2 = '\ue98b'
-    truck = '⎌'
-    tulip = '\ue98a'    # actually daisy
-    underline = '▁'
-    water = '\ue90b'
-    wine = '🍷'
-    zoe = '\uea6f'
-
-    books = '📚'
-    open_book = '📖'
-    cactus = '🌵'
-    car = '🚗'
-    coin = '🌕'
-    cow = '🐮'
-    elephant = '🐘'     # Grobo
-    ferry = '🚤'
-    flag = '▶'
-    horn = '📯'
-    key = '🔑'
-    monkey = '🐵'
-    rabbit = '🐰'
-    rock2 = '║'
-    tree1 = '🌲'
-    tree2 = '🌳'
-    tulip = '🌷'
-    zoe = '👩'
-
-    crates = (crate1, crate2, crate3, crate4)
-
-class Blocks:
     platform = '▁'
     bell = '🔔'
     grill = '▒'
@@ -256,6 +145,193 @@ class Blocks:
     funfrock = 'F'
 
     crates = (crate1, crate2, crate3, crate4)
+
+noto_tiles = """fountain
+sailboat
+snowman
+snowflake
+water
+tree1
+tree2
+palm
+cactus
+flower1
+flower2
+flower3
+flower4
+flower5
+leaf1
+leaf2
+leaf3
+guitar
+trumpet
+monkey
+elephant
+soldier
+card
+chair
+PC
+sharp-rock1
+sharp-rock2
+book1
+book2
+book3
+book4
+book5
+key
+seal
+truck
+ship
+flag
+man
+girl
+door
+bull
+cow
+""".split()
+noto_tiles = {k: 0xe300+n for n,k in enumerate(noto_tiles)}
+
+gnu_tiles = """bottle1
+bike
+top-platform
+backslash
+statue
+bottle2
+dock-platform
+water
+ladder
+circle1
+circle2
+square1
+square2
+square3
+square4
+cabinet
+sailboat2
+soldier
+plat1
+plat2
+plat3
+plat4
+sailboat3
+spec-stone
+chair
+bars
+stool
+grill1
+grill2
+grill3
+step-l
+step-r
+crate1
+crate2
+crate3
+crate4
+snowman
+shelves
+water2
+rock
+heart
+white-sq
+""".split()
+gnu_tiles = {k: 0xe400+n for n,k in enumerate(gnu_tiles)}
+# print("gnu_tiles", gnu_tiles)
+# sys.exit()
+
+class Blocks:
+    rock = gnu_tiles['rock']
+    lever = '-'
+    shelves = gnu_tiles['shelves']
+    ladder = gnu_tiles['ladder']
+    platform2 = '_'
+    platform_top = gnu_tiles['top-platform']
+    rock2 = gnu_tiles['white-sq']
+
+    platform = '▁'
+    bell = '🔔'
+    grill = gnu_tiles['grill1']
+    rubbish = '♽'
+    truck = noto_tiles['truck']
+    locker = gnu_tiles['cabinet']
+    grn_heart = gnu_tiles['heart'] # 2665
+    coin = gnu_tiles['circle1']
+    key = noto_tiles['key']
+    door = noto_tiles['door']
+    block1 = gnu_tiles['rock']
+    steps_r = gnu_tiles['step-r']
+    steps_l = gnu_tiles['step-l']
+    chair = gnu_tiles['chair']
+    fountain = noto_tiles['fountain']
+    stool = gnu_tiles['stool']
+    underline = '_'
+    cupboard = gnu_tiles['cabinet']
+    sunflower = noto_tiles['flower1']
+    magic_ball = gnu_tiles['circle2']
+    crate1 = gnu_tiles['crate1']
+    crate2 = gnu_tiles['crate2']
+    crate3 = gnu_tiles['crate3']
+    crate4 = gnu_tiles['crate4']
+    smoke_pipe = gnu_tiles['bars']
+    fireplace = '^'
+    water = gnu_tiles['water']
+    elephant = noto_tiles['elephant']     # Grobo
+    rabbit = noto_tiles['bull']
+    wine = '🍷'
+    dock_boards = gnu_tiles['dock-platform']
+    ticket_seller = '^'
+    ferry = noto_tiles['ship']
+    ferry_ticket = 't'
+    soldier = noto_tiles['soldier']
+    bars = gnu_tiles['bars']
+    tree1 = noto_tiles['tree1']
+    tree2 = noto_tiles['tree2']
+    books = noto_tiles['book1']
+    open_book = noto_tiles['book2']
+    guardrail_l = '╔'
+    guardrail_r = '╕'
+    guardrail_m = '╤'
+    tulip = noto_tiles['flower1']
+    monkey = noto_tiles['monkey']
+    antitank = '*'
+    # rock2 = '║'
+
+    #---------------
+    rock3 = gnu_tiles['grill2']
+    angled1 = '/'
+    angled2 = gnu_tiles['backslash']
+    # picture = noto_tiles['picture']
+    picture = 'o'
+    car = noto_tiles['truck']
+    bottle = gnu_tiles['bottle2']
+    box1 = gnu_tiles['cabinet']
+    cactus = noto_tiles['cactus']
+
+    statue = gnu_tiles['statue']
+    sharp_rock = noto_tiles['sharp-rock1']
+    runes = '⩰'
+    cow = noto_tiles['cow']
+    hair_dryer = 'D'
+    proto_pack = 'P'
+
+    flag = noto_tiles['flag']
+    horn = noto_tiles['trumpet']
+    medallion = gnu_tiles['circle1']
+    seal = noto_tiles['seal']
+    special_stone = gnu_tiles['spec-stone']
+    flute = noto_tiles['trumpet']
+    snowman = noto_tiles['snowman']
+
+    snowflake = noto_tiles['snowflake']
+    dynofly = 'D'
+    safe = gnu_tiles['square4']
+    saber = ')'
+    pod = '≃'
+    computer = noto_tiles['PC']
+    zoe = noto_tiles['girl']
+    funfrock = 'F'
+
+    crates = (crate1, crate2, crate3, crate4)
+NewBlocks = Blocks
 
 class Stance:
     normal = 1
@@ -678,7 +754,7 @@ class Board:
     def board_3(self):
         """Soldier, rubbish heap."""
         containers, crates, doors, specials = self.load_map(self._map)
-        RoboBunny(self, specials[1], id=ID.robobunny1)
+        RoboBunny(self, specials[1], id=ID.robobunny1, name='Anka')
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill2)
         s = Soldier(self, specials[3], id=ID.soldier1)
         self.soldiers.append(s)
@@ -686,7 +762,7 @@ class Board:
     def board_4(self):
         self.labels.append((0,20, "𝓪𝓫𝓮 𝓸𝓵𝓭 𝓼𝓱𝓸𝓹𝓹𝓮"))    # Abe old shoppe
         containers, crates, doors, specials = self.load_map(self._map)
-        Item(self, Blocks.platform_top, 'platform', specials[Blocks.platform_top], id=ID.platform_top1, type=Type.platform_top)
+        Item(self, Blocks.platform_top, 'platform', specials[2], id=ID.platform_top1, type=Type.platform_top)
         ShopKeeper(self, specials[1], name='Abe', id=ID.shopkeeper1)
         containers[3].inv[ID.jar_syrup] = 1
 
@@ -714,7 +790,7 @@ class Board:
     def board_7(self):
         self.labels.append((10,5, "𝒯𝒽𝑒 𝐹𝑒𝓇𝓇𝓎"))
         containers, crates, doors, specials = self.load_map(self._map)
-        julien, clone1 = specials[Blocks.elephant]
+        julien, clone1 = specials[NewBlocks.elephant]
         # key3 = Item(self, Blocks.key, 'key', id=ID.key3, put=0)
         clone1.inv[ID.key3] = 1
         julien.id = ID.julien
@@ -783,7 +859,7 @@ class Board:
         Being(self, specials[9], id=ID.aubigny, name='Aubigny', char=Blocks.rabbit)
 
         Item(self, Blocks.fountain, 'sink', specials[5], id=ID.sink)
-        Item(self, Blocks.hexagon, 'A Drawing with a romantic view and a horse galloping at full speed across the plain', specials[6], id=ID.drawing)
+        Item(self, Blocks.picture, 'A Drawing with a romantic view and a horse galloping at full speed across the plain', specials[6], id=ID.drawing)
         Item(self, Blocks.grill, 'grill', specials[8], id=ID.grill7)
 
     def board_top2(self): self.load_map(self._map)
@@ -985,6 +1061,7 @@ class Board:
         self.containers = containers = []
         self.doors = doors = []
         self.specials = specials = defaultdict(list)
+        Blocks = OLDBlocks
         BL=Blocks
 
         for y in range(HEIGHT):
@@ -993,20 +1070,21 @@ class Board:
                 loc = Loc(x,y)
                 if char != blank:
                     if char==rock:
-                        self.put(rock, loc)
+                        # self.put(rock, loc)
+                        Item(self, NewBlocks.rock, '', loc, type=Type.blocking)
                     elif char==Blocks.ladder:
-                        Item(self, Blocks.ladder, 'ladder', loc, type=Type.ladder)
+                        Item(self, NewBlocks.ladder, 'ladder', loc, type=Type.ladder)
 
-                    elif char==Blocks.door:
-                        d = Item(self, Blocks.door, 'door', loc, type=Type.door1)
+                    elif char==Blocks.door or char=='d':
+                        d = Item(self, NewBlocks.door, 'door', loc, type=Type.door1)
                         doors.append(d)
 
                     elif char=='D':
-                        d = Item(self, Blocks.door, 'steel door', loc, type=Type.door2)
+                        d = Item(self, NewBlocks.door, 'steel door', loc, type=Type.door2)
                         doors.append(d)
 
                     elif char=='g':
-                        Item(self, Blocks.grn_heart, 'grn_heart', loc, id=ID.grn_heart)
+                        Item(self, NewBlocks.grn_heart, 'grn_heart', loc, id=ID.grn_heart)
 
                     elif char==Blocks.locker or char=='o':
                         l = Locker(self, loc)
@@ -1017,104 +1095,110 @@ class Board:
                         containers.append(c)
 
                     elif char in Blocks.crates or char=='C':
-                        c = Item(self, choice(Blocks.crates), 'crate', loc)
+                        c = Item(self, choice(NewBlocks.crates), 'crate', loc)
                         crates.append(c)
 
                     elif char=='s':
-                        Item(self, Blocks.sunflower, 'sunflower', loc)
+                        Item(self, NewBlocks.sunflower, 'sunflower', loc)
 
                     elif char==Blocks.sharp_rock:
-                        Item(self, Blocks.sharp_rock, 'sharp_rock', loc, type=Type.deadly)
+                        Item(self, NewBlocks.sharp_rock, 'sharp_rock', loc, type=Type.deadly)
 
                     elif char == BL.snowman:
-                        Item(self, char, 'snowman', loc)
+                        Item(self, NewBlocks.snowman, 'snowman', loc)
                     elif char == BL.snowflake:
-                        Item(self, char, 'snowflake', loc)
+                        Item(self, NewBlocks.snowflake, 'snowflake', loc)
 
                     elif char==Blocks.rock3:
-                        Item(self, Blocks.rock3, 'rock', loc, type=Type.blocking)
+                        Item(self, NewBlocks.rock3, 'rock', loc, type=Type.blocking)
 
                     elif char==Blocks.block1:
-                        Item(self, Blocks.block1, 'block', loc, type=Type.door_top_block)
+                        Item(self, NewBlocks.block1, 'block', loc, type=Type.door_top_block)
 
                     elif char==Blocks.smoke_pipe:
-                        Item(self, Blocks.smoke_pipe, 'smoke pipe', loc, type=Type.ladder)
+                        Item(self, NewBlocks.smoke_pipe, 'smoke pipe', loc, type=Type.ladder)
 
                     elif char==Blocks.cactus:
-                        Item(self, Blocks.cactus, 'cactus', loc)
+                        Item(self, NewBlocks.cactus, 'cactus', loc)
 
                     elif char==Blocks.fireplace:
-                        Item(self, Blocks.fireplace, 'fireplace', loc)
+                        Item(self, NewBlocks.fireplace, 'fireplace', loc)
 
                     elif char==Blocks.water:
-                        Item(self, Blocks.water, 'water', loc, type=Type.water)
+                        Item(self, NewBlocks.water, 'water', loc, type=Type.water)
 
                     elif char==Blocks.stool:
-                        Item(self, Blocks.stool, 'bar stool', loc)
+                        Item(self, NewBlocks.stool, 'bar stool', loc)
 
                     elif char=='t':
-                        Item(self, Blocks.tulip, 'tulip', loc)
+                        Item(self, NewBlocks.tulip, 'tulip', loc)
 
                     elif char==Blocks.antitank:
-                        Item(self, Blocks.antitank, 'antitank hedgehog obstacle', loc)
+                        Item(self, NewBlocks.antitank, 'antitank hedgehog obstacle', loc)
 
                     elif char==Blocks.fountain:
-                        Item(self, Blocks.fountain, 'water fountain basin', loc)
+                        Item(self, NewBlocks.fountain, 'water fountain basin', loc)
 
                     elif char==Blocks.dock_boards:
-                        Item(self, Blocks.dock_boards, 'dock boards', loc, type=Type.blocking)
+                        Item(self, NewBlocks.dock_boards, 'dock boards', loc, type=Type.blocking)
 
                     elif char==Blocks.grill:
-                        Item(self, Blocks.grill, 'barred window', loc)
+                        Item(self, NewBlocks.grill, 'barred window', loc)
 
                     elif char==Blocks.rubbish:
-                        Item(self, Blocks.rubbish, 'rubbish', loc, id=ID.rubbish1)
+                        Item(self, NewBlocks.rubbish, 'pile of rubbish', loc, id=ID.rubbish1)
 
-                    elif char in (BL.books, BL.open_book):
-                        Item(self, char, 'books', loc)
+                    elif char == BL.books:
+                        Item(self, NewBlocks.books, 'books', loc)
 
-                    elif char in (Blocks.tree1, Blocks.tree2):
-                        Item(self, char, 'tree', loc)
+                    elif char == BL.open_book:
+                        Item(self, NewBlocks.open_book, 'open book', loc)
 
-                    elif char in (BL.guardrail_l, BL.guardrail_r, BL.guardrail_m):
-                        Item(self, char, 'guardrail', loc)
+                    elif char == BL.tree1:
+                        Item(self, NewBlocks.tree1, 'tree', loc)
+
+                    elif char == BL.tree2:
+                        Item(self, NewBlocks.tree2, 'tree', loc)
+
+                    # elif char in (BL.guardrail_l, BL.guardrail_r, BL.guardrail_m):
+                    #     Item(self, char, 'guardrail', loc)
 
                     elif char==Blocks.shelves:
-                        s = Item(self, Blocks.shelves, 'shelves', loc, type=Type.container)
+                        s = Item(self, NewBlocks.shelves, 'shelves', loc, type=Type.container)
                         containers.append(s)
 
                     elif char==Blocks.ferry:
-                        Item(self, Blocks.ferry, 'ferry', loc, id=ID.ferry)
+                        Item(self, NewBlocks.ferry, 'ferry', loc, id=ID.ferry)
 
                     elif char==Blocks.bars:
-                        Item(self, Blocks.bars, 'jail bars', loc, type=Type.blocking)
-
-                    elif char in (BL.angled1, BL.angled2):
-                        Item(self, char, '', loc, type=Type.blocking)
+                        Item(self, NewBlocks.bars, 'jail bars', loc, type=Type.blocking)
 
                     elif char==Blocks.angled1:
-                        Item(self, Blocks.angled1, '', loc, type=Type.blocking)
+                        Item(self, NewBlocks.angled1, '', loc)
+
+                    elif char==Blocks.angled2:
+                        Item(self, NewBlocks.angled2, '', loc, type=Type.blocking)
 
                     elif char==Blocks.rock2:
-                        Item(self, char, '', loc)
+                        Item(self, NewBlocks.rock2, '', loc)
 
                     elif char==Blocks.platform_top:
-                        specials[Blocks.platform_top] = loc
+                        specials[NewBlocks.platform_top] = loc
                         if for_editor:
-                            self.put(Blocks.platform_top, loc)
+                            self.put(NewBlocks.platform_top, loc)
 
                     elif char==Blocks.steps_l:
-                        self.put(Blocks.steps_l, loc)
-
-                    elif char==Blocks.platform2:
-                        Item(self, Blocks.platform2, '', loc, type=Type.blocking)
+                        Item(self, NewBlocks.steps_l, '', loc, type=Type.blocking)
 
                     elif char==Blocks.steps_r:
-                        self.put(Blocks.steps_r, loc)
+                        Item(self, NewBlocks.steps_r, '', loc, type=Type.blocking)
+
+                    elif char==Blocks.platform2:
+                        Item(self, NewBlocks.platform2, '', loc, type=Type.blocking)
 
                     elif char==Blocks.elephant:
                         g = Grobo(self, loc)
-                        specials[Blocks.elephant].append(g)
+                        specials[NewBlocks.elephant].append(g)
 
                     elif char==Blocks.soldier:
                         s = Soldier(self, loc)
@@ -1169,12 +1253,14 @@ class Board:
                 # tricky bug: if an 'invisible' item put somewhere, then a being moves on top of it, it's drawn, but
                 # when it's moved out, the invisible item is drawn, but being an empty string, it doesn't draw over the
                 # being's char, so the 'image' of the being remains there, even after being moved away.
-                cell = [c for c in cell if str(c)]
+                cell = [c for c in cell if getattr(c,'char',None)!='']
                 a = last(cell)
                 if isinstance(a, int):
                     a = objects[a]
-                Windows.win.addstr(y,x, str(a))
-                # Windows.win.addstr(y,x, a)
+                # if isinstance(a, str):
+                Windows.win.addstr(y, x, str(a))
+                # else:
+                    # Windows.win.addstr(y, x, a.char)
         for y,x,txt in self.labels:
             Windows.win.addstr(y,x,txt)
         # for loc, col in self.colors:
@@ -1254,6 +1340,12 @@ class BeingItemMixin:
     is_player = 0
     state = 0
 
+    def __str__(self):
+        c=self.char
+        if isinstance(c, int):
+            c = '[U+{}]'.format(hex(c)[2:])
+        return c
+
     def tele(self, loc):
         self.B.remove(self)
         self.put(loc)
@@ -1310,9 +1402,6 @@ class Item(BeingItemMixin):
             objects[id] = self
         if B and put:
             B.put(self)
-
-    def __str__(self):
-        return self.char
 
     def __repr__(self):
         return f'<I: {self.char}>'
@@ -1386,9 +1475,6 @@ class Being(BeingItemMixin):
         if put:
             B.put(self)
 
-    def __str__(self):
-        return self.char
-
     def update_refs(self):
         """Update references in `objects` in case there was a game load from a save"""
 
@@ -1426,7 +1512,9 @@ class Being(BeingItemMixin):
             offset_y = lines if loc.y<8 else -lines
 
             y = max(0, loc.y+offset_y)
-            Windows.win.addstr(x+1,y+1, txt + (' [Y/N]' if yesno else ''))
+            # print('addstr:', x+1,y+1, txt + (' [Y/N]' if yesno else ''))
+            # Windows.win.addstr(5,5, 'TEST dialog\nline 2 test')
+            Windows.win.addstr(y+1,x+1, txt + (' [Y/N]' if yesno else ''))
 
             if yesno:
                 # TODO in some one-time dialogs, may need to detect 'no' explicitly
@@ -1455,6 +1543,7 @@ class Being(BeingItemMixin):
 
             Windows.refresh()
             blt.read()
+            # prompt()
             self.B.draw(Windows.win)
 
     def _move(self, dir, fly=False):
@@ -1628,6 +1717,7 @@ class Being(BeingItemMixin):
                 B.remove(x, new)
 
         names = [o.name for o in B.get_all_obj(new) if o.name]
+
         plural = len(names)>1
         names = ', '.join(names)
         if names:
@@ -2695,12 +2785,8 @@ class Timer:
         self.turns, self.evt = turns, evt
 
 class Player(Being):
-    # char = '\uea6f'
-    char = '🙍'
-    char = 0xf183
-    # char = '[U+f183]'.format(hex(0xf183)[2:])
-    char = '[U+{}]'.format(hex(0xf183+300)[2:])
-    print("char", char)
+    # char = '🙍'
+    char = noto_tiles['man']
     health = 10
     is_player = 1
     stance = Stance.sneaky
@@ -2712,28 +2798,31 @@ class Guard(Being):
 
 class Soldier(Being):
     health = 20
-    char = Blocks.soldier
+    char = NewBlocks.soldier
 
 class Technician(Being):
     char = 't'
 
 class RoboBunny(Being):
-    char = Blocks.rabbit
+    char = NewBlocks.rabbit
 
 class Clone(Being):
-    char = Blocks.elephant
+    char = NewBlocks.elephant
 
 class ShopKeeper(Being):
-    char = '🙇'
+    char = NewBlocks.monkey
 
 class Grobo(Being):
-    char = Blocks.elephant
+    char = NewBlocks.elephant
 
 
 class Win1:
     @staticmethod
     def addstr(y,x, text):
-        blt.puts(x, y, text)
+        if isinstance(text, str):
+            blt.puts(x, y, text)
+        else:
+            blt.put(x, y, text)
 
 class Win2:
     @staticmethod
@@ -2815,55 +2904,19 @@ class Colors:
     blue_on_black = 5
 
 def main(load_game):
-    """
-    key f084
-    flag f024
-    computer f109
-    twig f18c
-    musical note f001
-    girl f182
-    cabinet? f0db
-    bell f0f3
-    man f183
-    truck f0d1
-    seal? f192, f140
-    robot f17b
-    file box f187
-    garbage can f014
-    book f02d
-    stairs f039, f0c9
-    coin? f111
-    bars f142
-    """
     blt.open()
     blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: Andale.ttf, size=24")
-    blt.set("sm font: Andale.ttf, size=8x12, spacing=1x1")
     blt.color("white")
     blt.composition(True)
+
     # blt.set("U+E200: Tiles.png, size=24x24, align=top-left")
-    blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
-    # blt.set("U+E300: ../Media/fontawesome-webfont.ttf, size=24x24, spacing=3x2, codepage=../Media/fontawesome-codepage.txt")
+    # blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
+    # blt.set("U+E300: fontello.ttf, size=16x16, spacing=3x2, codepage=cp.txt")
+    blt.set("U+E300: NotoEmoji-Regular.ttf, size=32x32, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
+    blt.set("U+E400: FreeMono.ttf, size=32x32, spacing=3x2, codepage=monocp.txt, align=top-left")           # GNU
+
     blt.clear()
     blt.color("white")
-    x = 0xe300
-        # oprint(n, 1+5*n%80, 5*n//80, x+n)
-
-    z=1
-    sw=1
-    with open('fontawesome-codepage.txt') as fp:
-        codes = fp.readlines()
-    while z:
-        wd = 120
-        for n in range(460):
-            blt.put(1+10*n%wd, 10*n//wd, x+n)
-            blt.puts(1+10*n%wd + 2, 10*n//wd, '[font=sm]{}[/font]'.format(codes[n]))
-        blt.refresh()
-
-        z = blt.read()
-        blt.clear()
-        sw = not sw
-        if z in ('q', blt.TK_CLOSE, blt.TK_ESCAPE):
-            return
 
     if not os.path.exists('saves'):
         os.mkdir('saves')
@@ -3215,10 +3268,10 @@ def handle_ui(B, player):
             triggered_events.append(GarbageTruckEvent)
         debug(str(triggered_events))
     elif k == 'o':
-        name = prompt(win2)
+        name = prompt()
         player, B = Saves().load(name)
     elif k == 's':
-        name = prompt(win2)
+        name = prompt()
         Saves().save(B.loc, name)
         status(f'Saved game as "{name}"')
         Windows.refresh()
@@ -3346,12 +3399,13 @@ def handle_ui(B, player):
     Windows.refresh()
     return B, player
 
-def prompt(win2):
+def prompt():
     mp = ''
     status('> ')
     Windows.refresh()
     while 1:
         k = parsekey(blt.read())
+        if not k: continue
         if k=='\n':
             return mp
         mp += k
@@ -3488,7 +3542,7 @@ def editor(_map):
                 elif cmd == 'v': B.put(BL.lever, loc)
                 elif cmd == 's': B.put(BL.sharp_rock, loc)
                 elif cmd == 'r': B.put(BL.rock3, loc)
-                elif cmd == 'd': B.put(BL.hexagon, loc)     # drawing
+                elif cmd == 'd': B.put('d', loc)     # drawing
                 elif cmd == 'R': B.put(Blocks.rabbit, loc)
 
                 elif any(c.startswith(cmd) for c in cmds):
