@@ -308,7 +308,7 @@ class Blocks:
 
     statue = gnu_tiles['statue']
     sharp_rock = noto_tiles['sharp-rock1']
-    runes = '⩰'
+    runes = gnu_tiles['shelves']
     cow = noto_tiles['cow']
     hair_dryer = 'D'
     proto_pack = 'P'
@@ -780,7 +780,14 @@ class Board:
         containers[0].inv[ID.magic_ball] = 1
         containers[0].add1(ID.key1)
         self.remove(crates[5])
-        self.put(ID.crate1, crates[5].loc)
+        # print('putting crate1', ID.crate1, crates[5].loc)
+        Item(self, Blocks.crate1, 'crate', crates[5].loc, id=ID.crate1)
+        # self.put(ID.crate1, crates[5].loc)
+        print("board_6: id(self)", id(self))
+        c = self[crates[5].loc]
+        print("c", id(c), c, c.loc)
+        c = objects[ID.crate1]
+        print("objects[ID.crate1]", id(c), c, c.loc)
 
         TriggerEventLocation(self, specials[1], evt=MaxState1)
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill4)
@@ -885,6 +892,7 @@ class Board:
         containers, crates, doors, specials = self.load_map(self._map)
         s=Soldier(self, specials[2])
         s.add1(ID.key1)
+        self.soldiers.append(s)
 
     def board_desert2(self):
         lrange = lambda *x: list(range(*x))
@@ -1316,6 +1324,7 @@ class Board:
         w = max(len(l) for l in txt) + 1
         X,Y = 5, 5
         for y, ln in enumerate(txt):
+            blt.clear_area(X, Y+y+1, w+3, 1)
             Windows.win.addstr(Y+y+1, X, ' ' + ln)
         Windows.refresh()
         blt.read()
@@ -1507,22 +1516,14 @@ class Being(BeingItemMixin):
             x = min(40, x)
             w = 78 - x
             lines = (len(txt) // w) + 4
-            txt = wrap(txt, w)
-            xsz = max(len(l) for l in txt)
-            ysz = len(txt)
-            txt = '\n'.join(txt)
+            txt_lines = wrap(txt, w)
+            txt = '\n'.join(txt_lines)
             offset_y = lines if loc.y<8 else -lines
 
             y = max(0, loc.y+offset_y)
-            _txt = txt + (' [Y/N]' if yesno else '')
-            # bg = blank * (len(txt) + 2)
-            print('clear area', x, y, xsz, ysz)
-            blt.clear_area(x+1, y+1, xsz, ysz)
-            # blt.clear_area(0, 0, 78, 16)
-            # blt.layer(1)
-            # Windows.win.addstr(y+1,x+1, ' [bkcolor=black]' + bgtxt + blank*6 + '[/color] ')
-            Windows.win.addstr(y+1,x+1, ' [bkcolor=black]' + txt + (' [Y/N]' if yesno else '') + '[/bkcolor] ')
-            # blt.layer(0)
+            xsz = max(len(l) for l in txt_lines)
+            blt.clear_area(x+1, y+1, xsz, len(txt_lines))
+            Windows.win.addstr(y+1,x+1, txt + (' [Y/N]' if yesno else ''))
 
             if yesno:
                 # TODO in some one-time dialogs, may need to detect 'no' explicitly
@@ -1530,6 +1531,7 @@ class Being(BeingItemMixin):
                 return k in 'Yy'
 
             elif multichoice:
+                Windows.refresh()
                 for _ in range(2):
                     k = parsekey(blt.read())
                     try:
@@ -1897,6 +1899,9 @@ class Being(BeingItemMixin):
         # elif len(ids)>1 and ids[-2] == ID.crate1:
         elif is_near('crate1'):
             c = B.get_top_obj(self.loc)
+            print("action: id(B)", id(B))
+            print("self.loc", self.loc)
+            print("in action(): c", id(c), c, c.loc)
             if c.id == ID.crate1:
                 c.move('l')
                 # obj[ids[-2]].move('l')
@@ -2277,9 +2282,15 @@ class Being(BeingItemMixin):
         x = 10
         y = 2
 
+        lst = []
         for n, (id,qty) in enumerate(self.inv.items()):
             item = objects[id]
-            Windows.win.addstr(y+n, x, f' {ascii_letters[n]}) {item.name:4} - {qty} ')
+            lst.append(f' {ascii_letters[n]}) {item.name:4} - {qty} ')
+        w = max(len(l) for l in lst)
+        blt.clear_area(x, y, w+2, len(lst))
+        for l in lst:
+            Windows.win.addstr(y+n, x, l)
+
         ch = parsekey(blt.read())
         item_id = None
         if ch in ascii_letters:
@@ -3137,9 +3148,9 @@ def main(load_game):
     Item(None, Blocks.magic_ball,'magic ball', id=ID.magic_ball)
     Item(None, 'c','blue card', id=ID.blue_card)
     Item(None, 'p','architect_pass', id=ID.architect_pass)
-    Item(None, Blocks.bottle, 'jar of strawberry syrup', id=ID.jar_syrup)
+    Item(None, Blocks.bottle1, 'jar of raspberry syrup', id=ID.jar_syrup)
     Item(None, Blocks.wine, 'half bottle of wine', id=ID.wine)
-    Item(None, Blocks.crate1, 'crate', id=ID.crate1)
+    # Item(None, Blocks.crate1, 'crate', id=ID.crate1)
     Item(None, Blocks.bottle, 'Bottle of clear water', id=ID.bottle_clear_water)
 
     f = obj_by_attr.ferry
@@ -3231,9 +3242,15 @@ def handle_ui(B, player):
     elif k=='f':
         player.stance = Stance.fight
         win2.addstr(1, 0, 'stance: fight')
+        Windows.refresh()
     elif k=='n':
         player.stance = Stance.normal
         win2.addstr(1, 0, 'stance: normal')
+        Windows.refresh()
+    elif k == 'S':
+        player.stance = Stance.sneaky
+        win2.addstr(1, 0, 'stance: sneaky')
+        Windows.refresh()
 
     elif k in 'hjklHL':
         Misc.last_dir = k
@@ -3283,9 +3300,6 @@ def handle_ui(B, player):
         Saves().save(B.loc, name)
         status(f'Saved game as "{name}"')
         Windows.refresh()
-    elif k == 'S':
-        player.stance = Stance.sneaky
-        win2.addstr(1, 0, 'stance: sneaky')
     elif k == 'v':
         status(str(player.loc))
     elif k == ' ':
@@ -3372,6 +3386,8 @@ def handle_ui(B, player):
         if attack:
             s.hostile = 1
             s.attack(player)
+        else:
+            s.hostile = 0
 
     if player.health <= 0:
         win2.addstr(1, 0, f'Hmm.. it looks like you lost the game!')
