@@ -238,12 +238,14 @@ block1
 slash
 alarm
 rubbish
+tele_pod
 """.split()
 gnu_tiles = {k: 0xe400+n for n,k in enumerate(gnu_tiles)}
 # print("gnu_tiles", gnu_tiles)
 # sys.exit()
 
 class Blocks:
+    tele_pod = gnu_tiles['tele_pod']
     rock = gnu_tiles['rock']
     lever = '-'
     shelves = gnu_tiles['shelves']
@@ -510,6 +512,7 @@ class ID:
     olivet3 = 157
     julien3 = 158
     clone1 = 159
+    tartas2 = 160
 
     max1 = 200
     max2 = 201
@@ -639,6 +642,8 @@ conversations = {
     ID.painter: ["This strange sign shows up on the wall over and over again! I paint it clean and the next day.. it's there!!"],
 
     ID.tartas: ["I can help but first you need to disable the teleportation pods and computers at the Teleportation Center!"],
+
+    ID.tartas2: 'Tartas starts digging and with surprising speed and verve; before long you see a hole appearing in the ground!!',
 
     ID.funfrock: ["You see Dr. FunFrock appear.", "He looks at you menacingly", "All of the nonsense with breaking of seals and attacking my soldiers and the prophecy is now over! Jailbirds belong in jail, and you are going back home!!!"],
 
@@ -982,18 +987,19 @@ class Board:
     def board_f_island2(self):
         containers, crates, doors, specials = self.load_map(self._map)
         s = Soldier(self, specials[1], id=ID.soldier4)
-        s2 = Soldier(self, specials[2], id=ID.soldier5)
-        self.guards.extend((s,s2))
+        # s2 = Soldier(self, specials[2], id=ID.soldier5)
+        self.soldiers.extend((s,))
         TriggerEventLocation(self, specials[3], evt=DrFunfrockTrapEvent)
         Being(self, specials[5], id=ID.zoe, name='Zoe', char=Blocks.zoe)
 
     def board_brundle(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Soldier(self, specials[1], id=ID.soldier3)
+        s=Soldier(self, specials[1], id=ID.soldier3)
+        self.soldiers.append(s)
         RoboBunny(self, specials[2], id=ID.painter, name='Jaca')
         Item(self, rock, '', specials[3], id=ID.stone2, type=Type.blocking)
         for n in range(4,7):
-            Item(self, Blocks.pod, 'Teleportation Pod', specials[n], type=Type.pod)
+            Item(self, Blocks.tele_pod, 'Teleportation Pod', specials[n], type=Type.pod)
         Item(self, Blocks.computer, 'Computer', specials[7], id=ID.computer)
 
     def board_estone(self):
@@ -1359,6 +1365,7 @@ class BeingItemMixin:
         return c
 
     def tele(self, loc):
+        print ("in def tele()", loc)
         self.B.remove(self)
         self.put(loc)
 
@@ -1528,8 +1535,7 @@ class Being(BeingItemMixin):
             if yesno:
                 W+=6
             blt.clear_area(x+1, y+1, W, len(txt_lines))
-            print( txt + (' [Y/N]' if yesno else '') )
-            Windows.win.addstr(y+1,x+1, txt + (' [Y/N]' if yesno else ''))
+            Windows.win.addstr(y+1,x+1, txt + (' [[Y/N]]' if yesno else ''))
             Windows.refresh()
 
             if yesno:
@@ -1549,11 +1555,13 @@ class Being(BeingItemMixin):
 
             if resp and m==len(dialog)-1:
                 i=''
+                Windows.win2.addstr(1,0, '> ')
+                Windows.refresh()
                 for _ in range(10):
                     k = parsekey(blt.read())
                     if k==' ': break
                     i+=k
-                    Misc.status.append(i)
+                    Windows.win2.addstr(1,0, '> '+i)
                     Windows.refresh()
                 return i
 
@@ -1574,6 +1582,7 @@ class Being(BeingItemMixin):
         return 0, 0
 
     def move(self, dir, fly=False):
+        # print("objects[ID.jar_syrup]", objects[ID.jar_syrup])
         B = self.B
         rv = self._move(dir, fly)
         if rv and (rv[0] == LOAD_BOARD):
@@ -2323,7 +2332,7 @@ class Being(BeingItemMixin):
             for loc in B.line(B.specials[1], B.specials[2]):
                 if B[loc] == rock:
                     B.remove(rock, loc)
-                B.put(Blocks.water, loc)
+                Item(B, Blocks.water, '', loc)
             self.inv[ID.empty_bottle] = 0
             Item(None, Blocks.bottle, 'Bottle of clear water', id=ID.bottle_clear_water)
             self.inv[ID.bottle_clear_water] = 1
@@ -2501,8 +2510,9 @@ class DrFunfrockTrapEvent(Event):
 class TartasDigsEvent(Event):
     once=1
     def go(self):
-        status('Tartas starts digging and with surprising speed and verve; before long you see a hole appearing in the ground!!')
-        self.B.remove(rock, obj_by_attr.tartas.loc.mod(y=1))
+        rock = self.B.get_top_obj(obj_by_attr.tartas.loc.mod(y=1))
+        self.B.remove(rock)
+        self.player.talk(self.player, ID.tartas2)
 
 class FollowTartasEvent(Event):
     once=1
@@ -3140,7 +3150,6 @@ def main(load_game):
     win2.addstr(0, 0, '-'*80)
     Windows.refresh()
 
-    Saves().save(B.loc, 'start')
     Misc.last_cmd = None
     Misc.wait_count = 0
     Misc.last_dir = 'l'
@@ -3172,6 +3181,8 @@ def main(load_game):
     # only to keep state to unlock Port Beluga
     m = Being(None, None, name='Maurice', char=Blocks.rabbit, id=ID.maurice, put=0)
     m.state=1
+
+    Saves().save(B.loc, 'start')
 
     while 1:
         rv = handle_ui(B, player)
@@ -3228,18 +3239,22 @@ keymap = dict(
 
     [ blt.TK_COMMA, ',' ],
     [ blt.TK_SPACE, ' ' ],
+    [ blt.TK_MINUS, '-' ],
     ]
     )
 
 def parsekey(k):
     if k and blt.check(blt.TK_WCHAR) or k==blt.TK_RETURN:
-        return keymap.get(k)
+        k = keymap.get(k)
+        if k and blt.state(blt.TK_SHIFT):
+            k = k.upper()
+            if k=='-':
+                k = '_'
+        return k
 
 def handle_ui(B, player):
     win, win2 = Windows.win, Windows.win2
     k = parsekey(blt.read())
-    if k and blt.state(blt.TK_SHIFT):
-        k = k.upper()
 
     def show_stats():
         key = '(key)' if player.has(ID.key1) else ''
@@ -3356,11 +3371,12 @@ def handle_ui(B, player):
             k = parsekey(blt.read())
             if not k: break
             mp+=k
-            status(k)
+            status(mp)
             Windows.refresh()
             if mp.endswith(' '):
                 try:
-                    x,y=k[:-1].split(',')
+                    x,y=mp[:-1].split(',')
+                    print(Loc(int(x), int(y)))
                     player.tele(Loc(int(x), int(y)))
                 except Exception as e:
                     print(e)
