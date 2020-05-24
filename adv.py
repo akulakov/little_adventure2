@@ -189,6 +189,7 @@ girl
 door
 bull
 cow
+funfrock
 """.split()
 noto_tiles = {k: 0xe300+n for n,k in enumerate(noto_tiles)}
 
@@ -338,7 +339,7 @@ class Blocks:
     pod = '≃'
     computer = noto_tiles['PC']
     zoe = noto_tiles['girl']
-    funfrock = 'F'
+    funfrock = noto_tiles['funfrock']
 
     crates = (crate1, crate2, crate3, crate4)
 NewBlocks = Blocks
@@ -953,7 +954,7 @@ class Board:
         # Item(self, Blocks.ferry, 'Sailboat', specials[1], id=ID.sailboat)
         Being(self, specials[2], id=ID.ruffec, name='Ruffec', char=Blocks.cow)
         for loc in self.line(Loc(61,7), Loc(67,7)):
-            B[loc].color = 'green'
+            self[loc].color = 'green'
 
     def board_proxima2(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -2863,7 +2864,7 @@ class Guard(Being):
     health = 3
 
 class Soldier(Being):
-    health = 20
+    health = 10
     char = NewBlocks.soldier
 
 class Technician(Being):
