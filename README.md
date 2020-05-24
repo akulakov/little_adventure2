@@ -16,7 +16,11 @@ To play, run `python3 adv.py`
 
 ## Gameplay hints
 
-Some hidden passages are so narrow that you have to sneak through them!
+ - In the beginning, try to attract the attention of the guard somehow!
+
+ - Some hidden passages are so narrow that you have to sneak through them!
+
+ - Once you get Gawley's horn, remember it can open Seals of Sendell which are sometimes hidden!
 
 # Commands
 
