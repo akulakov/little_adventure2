@@ -302,7 +302,7 @@ class Blocks:
 
     #---------------
     rock3 = gnu_tiles['grill2']
-    angled1 = '/'
+    angled1 = gnu_tiles['slash']
     angled2 = gnu_tiles['backslash']
     # picture = noto_tiles['picture']
     picture = 'o'
@@ -785,14 +785,9 @@ class Board:
         containers[0].inv[ID.magic_ball] = 1
         containers[0].add1(ID.key1)
         self.remove(crates[5])
-        # print('putting crate1', ID.crate1, crates[5].loc)
         Item(self, Blocks.crate1, 'crate', crates[5].loc, id=ID.crate1)
-        # self.put(ID.crate1, crates[5].loc)
-        print("board_6: id(self)", id(self))
-        c = self[crates[5].loc]
-        print("c", id(c), c, c.loc)
-        c = objects[ID.crate1]
-        print("objects[ID.crate1]", id(c), c, c.loc)
+        # c = self[crates[5].loc]
+        # c = objects[ID.crate1]
 
         TriggerEventLocation(self, specials[1], evt=MaxState1)
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill4)
@@ -1529,8 +1524,11 @@ class Being(BeingItemMixin):
             offset_y = lines if loc.y<8 else -lines
 
             y = max(0, loc.y+offset_y)
-            xsz = max(len(l) for l in txt_lines)
-            blt.clear_area(x+1, y+1, xsz, len(txt_lines))
+            W = max(len(l) for l in txt_lines)
+            if yesno:
+                W+=6
+            blt.clear_area(x+1, y+1, W, len(txt_lines))
+            print( txt + (' [Y/N]' if yesno else '') )
             Windows.win.addstr(y+1,x+1, txt + (' [Y/N]' if yesno else ''))
             Windows.refresh()
 
@@ -1560,7 +1558,9 @@ class Being(BeingItemMixin):
                 return i
 
             Windows.refresh()
-            blt.read()
+            k=None
+            while k!=' ':
+                k = parsekey(blt.read())
             # prompt()
             self.B.draw(Windows.win)
 
@@ -1882,6 +1882,7 @@ class Being(BeingItemMixin):
                 obj.baldino.state = 3
                 # pp = Item(None, Blocks.proto_pack, 'Proto-pack', id=ID.proto_pack)
                 self.inv[ID.proto_pack] = 1
+                status('Baldino gives you the Proto-pack')
 
     def action(self):
         B=self.B
@@ -1907,9 +1908,9 @@ class Being(BeingItemMixin):
         # elif len(ids)>1 and ids[-2] == ID.crate1:
         elif is_near('crate1'):
             c = B.get_top_obj(self.loc)
-            print("action: id(B)", id(B))
-            print("self.loc", self.loc)
-            print("in action(): c", id(c), c, c.loc)
+            # print("action: id(B)", id(B))
+            # print("self.loc", self.loc)
+            # print("in action(): c", id(c), c, c.loc)
             if c.id == ID.crate1:
                 c.move('l')
                 # obj[ids[-2]].move('l')
@@ -2296,12 +2297,13 @@ class Being(BeingItemMixin):
             lst.append(f' {ascii_letters[n]}) {item.name:4} - {qty} ')
         w = max(len(l) for l in lst)
         blt.clear_area(x, y, w+2, len(lst))
-        for l in lst:
+        for n, l in enumerate(lst):
             Windows.win.addstr(y+n, x, l)
+        Windows.refresh()
 
         ch = parsekey(blt.read())
         item_id = None
-        if ch in ascii_letters:
+        if ch and ch in ascii_letters:
             try:
                 item_id = list(self.inv.keys())[string.ascii_letters.index(ch)]
             except IndexError:
@@ -2803,6 +2805,7 @@ class SoldierEvent2(Event):
                 soldier.hostile = 1
             else:
                 soldier.state = 1
+                pl.talk(soldier, 'Well, good then.')
 
 def rev_dir(dir):
     return dict(h='l',l='h',j='k',k='j')[dir]
@@ -3229,15 +3232,20 @@ keymap = dict(
     )
 
 def parsekey(k):
-    if blt.check(blt.TK_WCHAR) or k==blt.TK_RETURN:
+    if k and blt.check(blt.TK_WCHAR) or k==blt.TK_RETURN:
         return keymap.get(k)
 
 def handle_ui(B, player):
     win, win2 = Windows.win, Windows.win2
     k = parsekey(blt.read())
-    print("k", k)
     if k and blt.state(blt.TK_SHIFT):
         k = k.upper()
+
+    def show_stats():
+        key = '(key)' if player.has(ID.key1) else ''
+        Misc.stats = f'({STANCES[player.stance]}) (H{player.health}) ({player.kashes} Kashes) {key}'
+        Windows.win2.addstr(0,0, Misc.stats)
+        Windows.refresh()
 
     # win2.clear()
     win2.addstr(1,0, ' '*78)
@@ -3249,18 +3257,15 @@ def handle_ui(B, player):
         return
     elif k=='f':
         player.stance = Stance.fight
-        # win2.addstr(1, 0, 'stance: fight')
-        B.display_status()
+        show_stats()
         Windows.refresh()
     elif k=='n':
         player.stance = Stance.normal
-        # win2.addstr(1, 0, 'stance: normal')
-        B.display_status()
+        show_stats()
         Windows.refresh()
     elif k == 'S':
         player.stance = Stance.sneaky
-        # win2.addstr(1, 0, 'stance: sneaky')
-        B.display_status()
+        show_stats()
         Windows.refresh()
 
     elif k in 'hjklHL':
@@ -3389,7 +3394,7 @@ def handle_ui(B, player):
         if g.hostile:
             g.attack(player)
     for s in B.soldiers:
-        attack =  s.hostile
+        attack = False
         if s.id == ID.clone1 and dist(s, player) <= 1:
             attack = True
         elif s.id!=ID.clone1 and dist(s, player) <= (1 if player.sneaky_stance else 5):
