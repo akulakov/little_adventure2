@@ -37,6 +37,7 @@ MAIN_Y = 3          # starting row of game boards
 SLP = 0.01
 SEQ_TYPES = (list, tuple)
 MAX_HEALTH = 50
+DBG = 0
 debug_log = open('debug', 'w')
 triggered_events = []
 done_events = set()
@@ -239,12 +240,14 @@ slash
 alarm
 rubbish
 tele_pod
+circle3
 """.split()
 gnu_tiles = {k: 0xe400+n for n,k in enumerate(gnu_tiles)}
 # print("gnu_tiles", gnu_tiles)
 # sys.exit()
 
 class Blocks:
+    circle3 = gnu_tiles['circle3']
     tele_pod = gnu_tiles['tele_pod']
     rock = gnu_tiles['rock']
     lever = '-'
@@ -770,14 +773,14 @@ class Board:
         self.soldiers.append(s)
 
     def board_4(self):
-        self.labels.append((0,20, "𝓪𝓫𝓮 𝓸𝓵𝓭 𝓼𝓱𝓸𝓹𝓹𝓮"))    # Abe old shoppe
+        self.labels.append((0,20, "Abe's Old Shoppe"))    # Abe old shoppe
         containers, crates, doors, specials = self.load_map(self._map)
         Item(self, Blocks.platform_top, 'platform', specials[2], id=ID.platform_top1, type=Type.platform_top)
         ShopKeeper(self, specials[1], name='Abe', id=ID.shopkeeper1)
         containers[3].inv[ID.jar_syrup] = 1
 
     def board_5(self):
-        self.labels.append((2,20, "𝓐𝓷𝓽𝓱𝓸𝓷𝔂 𝓫𝓪𝓻"))
+        self.labels.append((2,20, "Anthony's Bar"))
         containers, crates, doors, specials = self.load_map(self._map)
         containers[2].add1(ID.key1)
         Grobo(self, specials[1], id=ID.max_, name='Max')
@@ -785,7 +788,7 @@ class Board:
         RoboBunny(self, specials[3], id=ID.graus, name='Mr. Graus')
 
     def board_6(self):
-        self.labels.append((2,20, "𝒯𝓌𝒾𝓃𝓈𝑒𝓃 𝐻𝑜𝓂𝑒"))
+        self.labels.append((2,20, "Twinsen's Home"))
         containers, crates, doors, specials = self.load_map(self._map)
         containers[0].inv[ID.magic_ball] = 1
         containers[0].add1(ID.key1)
@@ -800,7 +803,7 @@ class Board:
         TriggerEventLocation(self, specials[3], evt=GroboClonesTakingZoeEvent)
 
     def board_7(self):
-        self.labels.append((10,5, "𝒯𝒽𝑒 𝐹𝑒𝓇𝓇𝓎"))
+        self.labels.append((10,5, "The Ferry"))
         containers, crates, doors, specials = self.load_map(self._map)
         julien, clone1 = specials[NewBlocks.elephant]
         # key3 = Item(self, Blocks.key, 'key', id=ID.key3, put=0)
@@ -845,7 +848,7 @@ class Board:
         self.load_map(self._map)
 
     def board_12(self):
-        self.labels.append((3,47, "𝒯𝒽𝑒 𝒞𝒾𝓉𝒶𝒹𝑒𝓁"))
+        self.labels.append((3,47, "The Citadel"))
         specials = self.load_map(self._map)[3]
         RoboBunny(self, specials[1], id=ID.brenne, name='Brenne')
         Item(self, '', '', specials[1].mod(0,-2), id=ID.talk_to_brenne)
@@ -858,8 +861,8 @@ class Board:
         self.load_map(self._map)
 
     def board_top1(self):
-        self.labels.append((0,2, "𝒜𝓈𝓉𝓇𝑜𝓃𝑜𝓂𝑒𝓇"))
-        self.labels.append((0,20, "𝐿𝑜𝒸𝓀𝓈𝓂𝒾𝓉𝒽"))
+        self.labels.append((0,2, "Astronomer"))
+        self.labels.append((0,20, "Locksmith"))
         containers, crates, doors, specials = self.load_map(self._map)
         doors[1].type = Type.door3
 
@@ -1032,7 +1035,11 @@ class Board:
 
     def board_himalaya2(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        self.colors = self.color_line(specials[1], specials[2], Colors.blue_on_black)
+        for loc in self.line(specials[1], specials[2]):
+            if self[loc] is blank:
+                Item(self, Blocks.rock, '', loc, color='blue')
+            else:
+                self[loc].color = 'blue'
         Item(self, '', '', specials[3], id=ID.clear_water_lake)
 
     def board_bar(self):
@@ -1174,9 +1181,6 @@ class Board:
                     elif char == BL.tree2:
                         Item(self, NewBlocks.tree2, 'tree', loc)
 
-                    # elif char in (BL.guardrail_l, BL.guardrail_r, BL.guardrail_m):
-                    #     Item(self, char, 'guardrail', loc)
-
                     elif char==Blocks.shelves:
                         s = Item(self, NewBlocks.shelves, 'shelves', loc, type=Type.container)
                         containers.append(s)
@@ -1271,10 +1275,12 @@ class Board:
                 a = last(cell)
                 if isinstance(a, int):
                     a = objects[a]
-                # if isinstance(a, str):
+                if getattr(a, 'type', None)==Type.water:
+                    a = f'[color=blue]{a}[/color]'
+                col = getattr(a, 'color', None)
+                if col:
+                    a = f'[color={col}]{a}[/color]'
                 Windows.win.addstr(y, x, str(a))
-                # else:
-                    # Windows.win.addstr(y, x, a.char)
         for y,x,txt in self.labels:
             Windows.win.addstr(y,x,txt)
         # for loc, col in self.colors:
@@ -1357,6 +1363,7 @@ def types(lst):
 class BeingItemMixin:
     is_player = 0
     state = 0
+    color = None
 
     def __str__(self):
         c=self.char
@@ -1411,8 +1418,8 @@ class BeingItemMixin:
 class Item(BeingItemMixin):
     board_map = None
 
-    def __init__(self, B, char, name, loc=None, put=True, id=None, type=None):
-        self.char, self.name, self.loc, self.id, self.type = char, name, loc, id, type
+    def __init__(self, B, char, name, loc=None, put=True, id=None, type=None, color=None):
+        self.char, self.name, self.loc, self.id, self.type, self.color = char, name, loc, id, type, color
         if B:
             self.board_map = B._map
 
@@ -1472,8 +1479,8 @@ class Being(BeingItemMixin):
     type = None
     char = None
 
-    def __init__(self, B, loc=None, put=True, id=None, name=None, state=0, hostile=False, health=None, char='?'):
-        self.id, self.loc, self.name, self.state, self.hostile  = id, loc, name, state, hostile
+    def __init__(self, B, loc=None, put=True, id=None, name=None, state=0, hostile=False, health=None, char='?', color=None):
+        self.id, self.loc, self.name, self.state, self.hostile, self.color  = id, loc, name, state, hostile, color
         if B:
             self.board_map = B._map
 
@@ -1829,7 +1836,8 @@ class Being(BeingItemMixin):
 
                 # Special kills
                 if B._map=='f_island2':
-                    if obj_by_attr.soldier4.dead and obj_by_attr.soldier5.dead:
+                    # if obj_by_attr.soldier4.dead and obj_by_attr.soldier5.dead:
+                    if obj_by_attr.soldier4.dead:
                         triggered_events.append(TartasDigsEvent)
                 if obj.id==ID.funfrock:
                     self.talk(self, conversations[ID.funfrock2])
@@ -2352,7 +2360,7 @@ class Being(BeingItemMixin):
             for loc in B.line(B.specials[1], B.specials[2]):
                 if B[loc] == rock:
                     B.remove(rock, loc)
-                Item(B, Blocks.water, '', loc)
+                Item(B, Blocks.water, '', loc, type=Type.water)
             self.inv[ID.empty_bottle] = 0
             Item(None, Blocks.bottle, 'Bottle of clear water', id=ID.bottle_clear_water)
             self.inv[ID.bottle_clear_water] = 1
@@ -2975,7 +2983,7 @@ def main(load_game):
     # blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
     # blt.set("U+E300: fontello.ttf, size=16x16, spacing=3x2, codepage=cp.txt")
     blt.set("U+E300: NotoEmoji-Regular.ttf, size=32x32, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
-    blt.set("U+E400: FreeMono.ttf, size=32x32, spacing=3x2, codepage=monocp.txt, align=top-left")           # GNU
+    blt.set("U+E400: FreeMono2.ttf, size=32x32, spacing=3x2, codepage=monocp.txt, align=top-left")           # GNU
 
     blt.clear()
     blt.color("white")
@@ -3266,17 +3274,24 @@ keymap = dict(
     )
 
 def parsekey(k):
+    if k==blt.TK_SHIFT:
+        return k
     if k and blt.check(blt.TK_WCHAR) or k==blt.TK_RETURN:
         k = keymap.get(k)
+        print("k", k)
         if k and blt.state(blt.TK_SHIFT):
             k = k.upper()
+            print("k", k)
             if k=='-':
                 k = '_'
+            print("k", k)
         return k
 
 def handle_ui(B, player):
     win, win2 = Windows.win, Windows.win2
     k = parsekey(blt.read())
+    if k==blt.TK_SHIFT:
+        return 1 # continue
 
     def show_stats():
         key = '(key)' if player.has(ID.key1) else ''
@@ -3365,6 +3380,8 @@ def handle_ui(B, player):
         while 1:
             k = parsekey(blt.read())
             if not k: break
+            if k == blt.TK_SHIFT:
+                continue
             mp += k
             status('> '+mp)
             Windows.refresh()
@@ -3444,7 +3461,7 @@ def handle_ui(B, player):
             s.hostile = 0
 
     if player.health <= 0:
-        win2.addstr(1, 0, f'Hmm.. it looks like you lost the game!')
+        Windows.win2.addstr(1, 0, f'Hmm.. it looks like you lost the game!')
         player, B = Saves().load('start')
 
     for evt in triggered_events:
@@ -3497,6 +3514,19 @@ def debug(*args):
 print=debug
 
 def editor(_map):
+    blt.open()
+    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: Andale.ttf, size=24")
+    blt.color("white")
+    blt.composition(True)
+
+    # blt.set("U+E200: Tiles.png, size=24x24, align=top-left")
+    # blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
+    # blt.set("U+E300: fontello.ttf, size=16x16, spacing=3x2, codepage=cp.txt")
+    blt.set("U+E300: NotoEmoji-Regular.ttf, size=32x32, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
+    blt.set("U+E400: FreeMono2.ttf, size=32x32, spacing=3x2, codepage=monocp.txt, align=top-left")           # GNU
+
+    blt.clear()
+    blt.color("white")
     Misc.is_game = 0
     begin_x = 0; begin_y = 0; width = 80
     loc = Loc(40, 8)
@@ -3509,12 +3539,15 @@ def editor(_map):
             for _ in range(HEIGHT):
                 fp.write(blank*78 + '\n')
     B.load_map(_map, 1)
+
     B.draw()
 
     while 1:
         k = parsekey(blt.read())
-        if k=='Q': return
-        elif k in 'hjklyubnHL':
+        if k == blt.TK_SHIFT:
+            continue
+        if k=='Q': break
+        elif k and k in 'hjklyubnHL':
             n = 1
             if k in 'HL':
                 n = 5
@@ -3548,10 +3581,10 @@ def editor(_map):
             B.put(Blocks.smoke_pipe, loc)
         elif k == 'd':
             B.put('d', loc)
-        elif k in '0123456789':
+        elif k and k in '0123456789':
             B.put(k, loc)
         elif k == 'w':
-            B.put(Blocks.water, loc)
+            Item(B, Blocks.water, 'water', loc)
         elif k == 't':
             B.put(Blocks.stool, loc)
         elif k == 'a':
@@ -3627,24 +3660,34 @@ def editor(_map):
                     continue
                 break
 
-        elif k in 'E':
-            win.addstr(2,2, 'Are you sure you want to clear the map? [Y/N]')
+        elif k == 'E':
+            Windows.win.addstr(2,2, 'Are you sure you want to clear the map? [Y/N]')
             y = parsekey(blt.read())
             if y=='Y':
                 for row in B.B:
                     for cell in row:
                         cell[:] = [blank]
                 B.B[-1][-1].append('_')
-        elif k in 'f':
+        elif k == 'f':
             B.put(Blocks.shelves, loc)
         elif k == 'W':
+            val_to_k = {v:k for k,v in Blocks.__dict__.items()}
             with open(f'maps/{_map}.map', 'w') as fp:
                 for row in B.B:
                     for cell in row:
-                        fp.write(str(cell[-1]))
+                        a = cell[-1]
+                        char = getattr(a, 'char', None)
+                        if char and isinstance(char,int) and char>500:
+                            k = val_to_k[char]
+                            a = getattr(OLDBlocks, k)
+                        fp.write(str(a))
                     fp.write('\n')
             written=1
+
         B.draw()
+        blt.clear_area(loc.x,loc.y,1,1)
+        Windows.win.addstr(loc.y, loc.x, Blocks.circle3)
+        Windows.refresh()
         if brush==blank:
             tool = 'eraser'
         elif brush==rock:
@@ -3653,22 +3696,26 @@ def editor(_map):
             tool = ''
         else:
             tool = brush
-        win.addstr(1,73, tool)
-        win.addstr(0, 0 if loc.x>40 else 70,
-                   str(loc))
+        Windows.win.addstr(1,73, tool)
+        Windows.win.addstr(0, 0 if loc.x>40 else 70,
+                           str(loc))
         if written:
-            win.addstr(2,65, 'map written')
+            Windows.win.addstr(2,65, 'map written')
             written=0
-        win.move(loc.y, loc.x)
+        # win.move(loc.y, loc.x)
+    blt.set("U+E100: none; U+E200: none; U+E300: none; zodiac font: none")
+    blt.composition(False)
+    blt.close()
 
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
-    DBG = first(argv) == '-d'
     load_game = None
-    a = first(argv)
-    if a and a.startswith('-l'):
-        load_game = a[2:]
+    for a in argv:
+        if a == '-d':
+            DBG = True
+        if a and a.startswith('-l'):
+            load_game = a[2:]
     if first(argv) == 'ed':
         editor(argv[1])
         # wrapper(editor, argv[1])
