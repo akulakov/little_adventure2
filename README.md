@@ -21,27 +21,33 @@ Some hidden passages are so narrow that you have to sneak through them!
 # Commands
 
 ## Move
-h - move left
-l - move right
-k - move up
-j - move down
 
-H and L - run
+    h - move left
+
+    l - move right
+
+    k - move up
+
+    j - move down
+
+    H and L - run
 
 ## Modes
-n - normal
-f - fighty
-S - sneaky  (some passages are small so have to be sneaked through)
+
+    n - normal
+    f - fighty
+    S - sneaky  (some passages are small so have to be sneaked through)
 
 
 ## Other
-space - action
-u - use item
-i - inventory
-. - wait
-m - magic ball (if you have it)
+
+    space - action
+    u - use item
+    i - inventory
+    . - wait
+    m - magic ball (if you have it)
 
 
-s - save game
-o - load game
-q - quit
+    s - save game
+    o - load game
+    q - quit
