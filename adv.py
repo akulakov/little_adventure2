@@ -719,7 +719,6 @@ class Board:
         self.doors = []
         self.spawn_locations = {}
         self.trigger_locations = {}
-        self.colors = []
         self.misc = []
         self.loc = loc
         self._map = str(_map)
@@ -880,35 +879,35 @@ class Board:
     def board_top2(self): self.load_map(self._map)
 
     def board_top3(self):
-        self.colors = [(Loc(50,11), Colors.blue_on_white)]     # window
         containers, crates, doors, specials = self.load_map(self._map)
         Item(self, Blocks.car, 'Car', specials[8], id=ID.car)
+        self[Loc(50,11)].color = 'blue'
 
     def board_beluga(self):
-        self.colors = [(Loc(41,6), Colors.blue_on_white)]     # window
         containers, crates, doors, specials = self.load_map(self._map)
         s=Item(self, Blocks.ferry, 'Sailboat', specials[8], id=ID.sailboat)
         s.state=1
         Being(self, specials[3], id=ID.buzancais, name='Buzancais', char=Blocks.cow)
+        self[Loc(41,6 )].color = 'blue'
 
     # -- White Leaf Desert --------------------------------------------------------------------------
 
     def board_desert1(self):
-        lrange = lambda *x: list(range(*x))
-        for x in [8,15] + lrange(23,27) + lrange(35,79):
-            self.colors.append((Loc(x,GROUND+1), Colors.yellow_on_white))
         containers, crates, doors, specials = self.load_map(self._map)
         s=Soldier(self, specials[2])
         s.add1(ID.key1)
         self.soldiers.append(s)
+        lrange = lambda *x: list(range(*x))
+        for x in [8,15] + lrange(23,27) + lrange(35,79):
+            self[Loc(x,GROUND+1)].color = 'yellow'
 
     def board_desert2(self):
-        lrange = lambda *x: list(range(*x))
-        for x in [8,15] + lrange(23,27) + lrange(35,60):
-            self.colors.append((Loc(x,GROUND+1), Colors.yellow_on_white))
         specials = self.load_map(self._map)[3]
         Being(self, specials[1], id=ID.olivet, name='Olivet', char=Blocks.rabbit)
         Item(self, Blocks.seal, 'strange seal', specials[2], id=ID.seal_sendell)
+        lrange = lambda *x: list(range(*x))
+        for x in lrange(3,20) + lrange(23,27) + lrange(35,60) + lrange(65,78):
+            self[Loc(x, GROUND+1)].color = 'yellow'
 
     def board_elf_lab(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -949,11 +948,12 @@ class Board:
         return l
 
     def board_proxima1(self):
-        self.colors = self.color_line(Loc(61,7), Loc(67,7), Colors.green_on_white)
 
         containers, crates, doors, specials = self.load_map(self._map)
         # Item(self, Blocks.ferry, 'Sailboat', specials[1], id=ID.sailboat)
         Being(self, specials[2], id=ID.ruffec, name='Ruffec', char=Blocks.cow)
+        for loc in self.line(Loc(61,7), Loc(67,7)):
+            B[loc].color = 'green'
 
     def board_proxima2(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -1010,7 +1010,6 @@ class Board:
         Item(self, Blocks.special_stone, 'Strange Stone', specials[1], id=ID.eclipse_stone)
 
     def board_museum(self):
-        self.colors = [(Loc(60,8), Colors.yellow_on_black)]
         containers, crates, doors, specials = self.load_map(self._map)
         Item(self, Blocks.lever, 'Museum Alarm', specials[1], id=ID.museum_alarm)
         Item(self, Blocks.door, '', specials[5], id=ID.museum_door, type=Type.door1)
@@ -1025,6 +1024,7 @@ class Board:
         containers[0].id = ID.treasure_chest
         k = Item(None, Blocks.key, 'Golden Key', id=ID.golden_key)
         containers[0].inv[ID.golden_key] = 1
+        self[Loc(60,8)].color = 'yellow'
 
     def board_prox_und(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -1072,8 +1072,6 @@ class Board:
 
     def board_wtower(self):
         specials = self.load_map(self._map)[3]
-        for loc in self.locs_rectangle(Loc(32,13), Loc(37,14)):
-            self.colors.append((loc, Colors.blue_on_white))
         Item(self, '', '', specials[1], id=ID.water_supply)
 
     def load_map(self, map_num, for_editor=0):
@@ -1283,8 +1281,6 @@ class Board:
                 Windows.win.addstr(y, x, str(a))
         for y,x,txt in self.labels:
             Windows.win.addstr(y,x,txt)
-        # for loc, col in self.colors:
-            # win.addstr(loc.y, loc.x, str(self[loc]), curses.color_pair(col))
         self.display_status()
         Misc.status = []
         Windows.win2.addstr(0,74, str(self._map))
@@ -2966,13 +2962,6 @@ def dist(a,b):
     return max(abs(a.loc.x - b.loc.x),
                abs(a.loc.y - b.loc.y))
 
-class Colors:
-    blue_on_white = 1
-    yellow_on_white = 2
-    green_on_white = 3
-    yellow_on_black = 4
-    blue_on_black = 5
-
 def main(load_game):
     blt.open()
     blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: Andale.ttf, size=24")
@@ -2991,19 +2980,8 @@ def main(load_game):
     if not os.path.exists('saves'):
         os.mkdir('saves')
     Misc.is_game = 1
-    # curses.init_pair(Colors.blue_on_white, curses.COLOR_BLUE, curses.COLOR_WHITE)
-    # curses.init_pair(Colors.yellow_on_white, curses.COLOR_YELLOW, curses.COLOR_WHITE)
-    # curses.init_pair(Colors.green_on_white, curses.COLOR_GREEN, curses.COLOR_WHITE)
-    # curses.init_pair(Colors.yellow_on_black, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-    # curses.init_pair(Colors.blue_on_black, curses.COLOR_BLUE, curses.COLOR_BLACK)
-
-    # begin_x = 0; begin_y = 0; width = 80
     win = Windows.win
-    # begin_x = 0; begin_y = 16; height = 6; width = 80
     win2 = Windows.win2
-
-    # win2.addstr(2,0, 'TEST')
-    # status('TEST')
 
     # generatable items
     coin = Item(None, Blocks.coin, 'coin', id=ID.coin)
