@@ -1259,7 +1259,7 @@ class Board:
             return objects.get(x) or x
         return any(get_obj(x).type==type for x in self.get_all_obj(loc))
 
-    def draw(self, win):
+    def draw(self):
         blt.clear()
         blt.color("white")
         for y, row in enumerate(self.B):
@@ -1525,6 +1525,8 @@ class Being(BeingItemMixin):
                 txt = '\n'.join(lst)
             x = min(40, x)
             w = 78 - x
+            if yesno:
+                txt += ' [[Y/N]]'
             lines = (len(txt) // w) + 4
             txt_lines = wrap(txt, w)
             txt = '\n'.join(txt_lines)
@@ -1532,10 +1534,8 @@ class Being(BeingItemMixin):
 
             y = max(0, loc.y+offset_y)
             W = max(len(l) for l in txt_lines)
-            if yesno:
-                W+=6
             blt.clear_area(x+1, y+1, W, len(txt_lines))
-            Windows.win.addstr(y+1,x+1, txt + (' [[Y/N]]' if yesno else ''))
+            Windows.win.addstr(y+1,x+1, txt)
             Windows.refresh()
 
             if yesno:
@@ -1570,7 +1570,7 @@ class Being(BeingItemMixin):
             while k!=' ':
                 k = parsekey(blt.read())
             # prompt()
-            self.B.draw(Windows.win)
+            self.B.draw()
 
     def _move(self, dir, fly=False):
         m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0))[dir]
@@ -1618,6 +1618,11 @@ class Being(BeingItemMixin):
             self.remove1(ID.key3)
             status('You open the door with your key')
             return None, None
+
+        if new and ID.red_door in B.get_ids(new):
+            status('You bump into a formidable door made out of a strange red metal.')
+        if new and ID.blue_door in B.get_ids(new):
+            status('You bump into a formidable door made out of a strange blue metal.')
 
         if new and B.is_blocked(new):
             if dir not in 'hlHL':
@@ -1859,6 +1864,8 @@ class Being(BeingItemMixin):
         items = {k:v for k,v in cont.inv.items() if v}
         lst = []
         for x in items:
+            if x==ID.grn_heart:
+                self.health = min(MAX_HEALTH, self.health+1)
             if x==ID.golden_key:
                 status('You have found the Golden Key that the runes at cave under your home spoke of!')
             if x==ID.coin:
@@ -2091,7 +2098,7 @@ class Being(BeingItemMixin):
 
             for n in (6,7,8):
                 B.remove(B[B.specials[n]])
-            status('The alarm sounds. you hear the noise of the grand oak door being shut and locked.')
+            self.talk(self, 'The alarm sounds. you hear the noise of the grand oak door being shut and locked.')
             B.state = 1
 
         elif is_near('fenioux'):
@@ -2162,9 +2169,22 @@ class Being(BeingItemMixin):
                 obj.platform5.move(dir, 2)
 
         elif is_near('lever5'):
-            dir = 'k' if obj.platform4.loc.y>5 else 'j'
-            obj.platform4.move(dir, 2)
-            obj.lever4.state=1
+            l3,l4,l5 = obj.lever3, obj.lever4, obj.lever5
+            if obj.lever4.state != 1:
+                dir = 'k' if obj.platform4.loc.y>5 else 'j'
+                obj.platform4.move(dir, 2)
+                obj.lever4.state=1
+            else:
+                if l5.state <= 1:
+                    obj.platform6.move('k')
+                    l5.state+=1
+                else:
+                    # reset
+                    l3.state = l4.state = l5.state = 0
+                    pl4,pl5,pl6 = obj.platform4, obj.platform5, obj.platform6
+                    for pl in (pl4,pl5,pl6):
+                        pl.tele(Loc(pl.x, GROUND-4))
+
 
         elif is_near('statue'):
             if not obj.statue.state:
@@ -2431,7 +2451,7 @@ class Event:
                 item.move(dir)
                 if carry_item:
                     carry_item.move(dir, fly=1)
-                B.draw(Windows.win)
+                B.draw()
                 sleep(sleep_time)
                 if item.loc.x==0:
                     B.remove(item)
@@ -2449,6 +2469,8 @@ class JailEvent(Event):
             B.soldiers.append(c)
             Guard(B, B.spawn_locations[6], id=ID.guard2)
             self.player.talk(self.player, 'Suddenly a Groboclone appears and leads you away...')
+            B.draw()
+            self.player.talk(self.player, '... .. You find yourself in a jail cell yet again.')
             # TODO: this is an ugly hack, instead an event should only be triggered when player is in state=1, and make
             # this a once=True event
             JailEvent.once = True
@@ -2558,7 +2580,7 @@ class TravelByFerry(Event):
         player = objects[ID.player]
         B = map_to_board('sea1')
         ferry = obj_by_attr.ferry
-        B.put(ferry, Loc(78,GROUND))
+        B.put(ferry, Loc(78,GROUND+1))
         self.animate(ferry, 'h', B=B)
         status('The ferry took you to ' + ('Principal Island' if dest=='8' else 'Citadel Island'))
         if dest == '8':
@@ -2606,7 +2628,7 @@ class TravelBySailboat(Event):
         player = objects[ID.player]
         B = map_to_board('sea1')
         sailboat = objects[ID.sailboat]
-        B.put(sailboat, Loc(78,GROUND))
+        B.put(sailboat, Loc(78, GROUND+1))
         self.animate(sailboat, 'h', B=B)
         status(f'The sailboat took you to {lname}')
         obj = obj_by_attr
@@ -2776,7 +2798,7 @@ class MagicBallEvent(Event):
                 dir = rev_dir(dir)
             if mb.loc == player.loc:
                 break
-            B.draw(Windows.win)
+            B.draw()
             sleep(0.15)
         B.remove(mb)
 
@@ -2789,7 +2811,7 @@ class BuyADrinkAnthony(Event):
             if pl.kashes>=2:
                 pl.kashes -= 2
                 pl.add1(ID.wine)
-                status('You bought a glass of wine.')
+                status('You bought half a bottle of wine.')
             else:
                 status("OH NO! You don't have enough kashes.. ..")
 
@@ -2806,7 +2828,7 @@ class SoldierEvent2(Event):
         soldier = obj_by_attr.soldier2
         pl = self.player
         pl.tele(pl.loc.mod(0,-3))
-        self.B.draw(Windows.win)
+        self.B.draw()
         pl.talk(pl, 'You climb through the window covered by a grill and escape to the open area')
         pl.state = 1
         if soldier.state == 0:
@@ -3145,7 +3167,7 @@ def main(load_game):
     )
 
     # stdscr.clear()
-    B.draw(win)
+    B.draw()
 
     win2.addstr(0, 0, '-'*80)
     Windows.refresh()
@@ -3156,7 +3178,7 @@ def main(load_game):
 
     if load_game:
         player, B = Saves().load(load_game)
-        B.draw(Windows.win)
+        B.draw()
 
     Item(None, 'H', 'hair dryer', id=ID.hair_dryer)
     Item(None, 'P', 'proto pack', id=ID.proto_pack)
@@ -3449,7 +3471,7 @@ def handle_ui(B, player):
         if not t.turns:
             triggered_events.append(t.evt)
     timers[:] = [t for t in timers if t.turns>0]
-    B.draw(win)
+    B.draw()
     key = '(key)' if player.has(ID.key1) else ''
     Misc.stats = f'({STANCES[player.stance]}) (H{player.health}) ({player.kashes} Kashes) {key}'
     Windows.refresh()
@@ -3487,7 +3509,7 @@ def editor(_map):
             for _ in range(HEIGHT):
                 fp.write(blank*78 + '\n')
     B.load_map(_map, 1)
-    B.draw(None)
+    B.draw()
 
     while 1:
         k = parsekey(blt.read())
@@ -3622,7 +3644,7 @@ def editor(_map):
                         fp.write(str(cell[-1]))
                     fp.write('\n')
             written=1
-        B.draw(win)
+        B.draw()
         if brush==blank:
             tool = 'eraser'
         elif brush==rock:
