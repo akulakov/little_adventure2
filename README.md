@@ -6,9 +6,11 @@ The game is inspired by the world and story of an old game called Little Big Adv
 
 Requirements
 ---
-- Python3  (On Mac OS run `brew install python3`)
-- tested in iTerm2 on Mac OS Sierra only (seems to also work in the default terminal) (https://www.iterm2.com/)
-    - Seems that unicode doesn't work properly in OS Catalina with character disappearing when 'up'/k is pressed
+
+- Python3  (On Mac OS run `brew install python3`, other platforms see http://www.python.org/downloads/)
+
+- bearlibterminal
+    `pip3 install bearlibterminal`
 
 To play, run `python3 adv.py`
 
@@ -37,7 +39,6 @@ space - action
 u - use item
 i - inventory
 . - wait
-E - examine current tile
 m - magic ball (if you have it)
 
 

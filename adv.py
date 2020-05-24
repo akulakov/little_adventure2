@@ -2965,7 +2965,7 @@ def dist(a,b):
 
 def main(load_game):
     blt.open()
-    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: Andale.ttf, size=24")
+    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono2.ttf, size=24")
     blt.color("white")
     blt.composition(True)
 
@@ -3249,6 +3249,7 @@ keymap = dict(
     [ blt.TK_COMMA, ',' ],
     [ blt.TK_SPACE, ' ' ],
     [ blt.TK_MINUS, '-' ],
+    [ blt.TK_SLASH, '/' ],
     ]
     )
 
@@ -3263,6 +3264,8 @@ def parsekey(k):
             print("k", k)
             if k=='-':
                 k = '_'
+            if k=='/':
+                k = '?'
             print("k", k)
         return k
 
@@ -3284,7 +3287,7 @@ def handle_ui(B, player):
         # win2.addstr(2,0,k)
     if not k:
         return 1
-    if k in ('q', blt.TK_CLOSE, blt.TK_ESCAPE):
+    if k in ('Q', blt.TK_CLOSE, blt.TK_ESCAPE):
         return
     elif k=='f':
         player.stance = Stance.fight
@@ -3298,6 +3301,28 @@ def handle_ui(B, player):
         player.stance = Stance.sneaky
         show_stats()
         Windows.refresh()
+    elif k == '?':
+        B.display("""
+                  MOVE
+                  hjkl - left/down/up/right
+                  H and L - run
+
+                  STANCE
+                  (n)ormal (f)ighty (S)neaky
+
+                  OTHER
+
+                  SPACE - action
+                  .     - wait
+
+                  (u)se item
+                  (i)nventory
+                  (m)agic ball - (if you have it)
+
+                  (s)ave game
+                  l(o)ad game
+                  (Q)uit game
+                  """.split('\n'))
 
     elif k in 'hjklHL':
         Misc.last_dir = k
@@ -3406,7 +3431,8 @@ def handle_ui(B, player):
         player.use()
 
     elif k == 'E':
-        B.display(str(B.get_all(player.loc)))
+        B.display([str(B.get_all(player.loc)).replace('[','[[').replace(']',']]')])
+        # player.talk(player, str(B.get_all(player.loc)))
     elif k == 'm':
         if player.has(ID.magic_ball):
             MagicBallEvent(B).go(player, Misc.last_dir)
