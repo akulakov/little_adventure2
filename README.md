@@ -45,6 +45,7 @@ To play, run `python3 adv.py`
 
 ## Other
 
+    ? - HELP
     space - action
     u - use item
     i - inventory
