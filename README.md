@@ -12,7 +12,7 @@ Requirements
 - bearlibterminal
     `pip3 install bearlibterminal`
 
-To play, run `python3 adv.py`
+To play, first clone the repo, `git clone git@github.com:akulakov/little_adventure2.git`; then run `python3 adv.py`
 
 ## Gameplay hints
 
