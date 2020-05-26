@@ -25,7 +25,7 @@ import shelve
 
 oprint = print
 
-__version__ = (0,4,0)
+__version__ = (0,4,2)
 
 rock = '█'
 blank = ' '
@@ -1334,7 +1334,7 @@ class Board:
 
     def display(self, txt):
         w = max(len(l) for l in txt) + 1
-        X,Y = 5, 5
+        X,Y = 5, 2
         for y, ln in enumerate(txt):
             blt.clear_area(X, Y+y+1, w+3, 1)
             Windows.win.addstr(Y+y+1, X, ' ' + ln)
@@ -3297,7 +3297,7 @@ def handle_ui(B, player):
         player.stance = Stance.normal
         show_stats()
         Windows.refresh()
-    elif k == 'S':
+    elif k == 's':
         player.stance = Stance.sneaky
         show_stats()
         Windows.refresh()
@@ -3308,7 +3308,7 @@ def handle_ui(B, player):
                   H and L - run
 
                   STANCE
-                  (n)ormal (f)ighty (S)neaky
+                  (n)ormal (f)ighty (s)neaky
 
                   OTHER
 
@@ -3319,7 +3319,7 @@ def handle_ui(B, player):
                   (i)nventory
                   (m)agic ball - (if you have it)
 
-                  (s)ave game
+                  (S)ave game
                   l(o)ad game
                   (Q)uit game
                   """.split('\n'))
@@ -3371,7 +3371,7 @@ def handle_ui(B, player):
             player, B = rv
         else:
             player.talk(player, 'Saved game not found')
-    elif k == 's':
+    elif k == 'S':
         name = prompt()
         Saves().save(B.loc, name)
         status(f'Saved game as "{name}"')

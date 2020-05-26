@@ -40,7 +40,7 @@ To play, first clone the repo, `git clone git@github.com:akulakov/little_adventu
 
     n - normal
     f - fighty
-    S - sneaky  (some passages are small so have to be sneaked through)
+    s - sneaky  (some passages are small so have to be sneaked through)
 
 
 ## Other
@@ -53,7 +53,7 @@ To play, first clone the repo, `git clone git@github.com:akulakov/little_adventu
     m - magic ball (if you have it)
 
 
-    s - save game
+    S - save game
     o - load game
     Q - quit
 
