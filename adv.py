@@ -37,6 +37,7 @@ SLP = 0.01
 SEQ_TYPES = (list, tuple)
 MAX_HEALTH = 50
 DBG = 0
+SIZE = 24           # tile size
 debug_log = open('debug', 'w')
 triggered_events = []
 done_events = set()
@@ -2966,15 +2967,16 @@ def dist(a,b):
 
 def main(load_game):
     blt.open()
-    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono2.ttf, size=24")
+    blt.set(f"window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono2.ttf, size={SIZE}")
     blt.color("white")
     blt.composition(True)
 
     # blt.set("U+E200: Tiles.png, size=24x24, align=top-left")
     # blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
     # blt.set("U+E300: fontello.ttf, size=16x16, spacing=3x2, codepage=cp.txt")
-    blt.set("U+E300: NotoEmoji-Regular.ttf, size=32x32, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
-    blt.set("U+E400: FreeMono2.ttf, size=32x32, spacing=3x2, codepage=monocp.txt, align=top-left")           # GNU
+    gl_size = SIZE+8
+    blt.set(f"U+E300: NotoEmoji-Regular.ttf, size={gl_size}x{gl_size}, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
+    blt.set(f"U+E400: FreeMono2.ttf, size={gl_size}x{gl_size}, spacing=3x2, codepage=monocp.txt, align=top-left")          # GNU
 
     blt.clear()
     blt.color("white")
@@ -3723,6 +3725,8 @@ if __name__ == "__main__":
             DBG = True
         if a and a.startswith('-l'):
             load_game = a[2:]
+        if a and a.startswith('-s'):
+            SIZE = int(a[2:])
     if first(argv) == 'ed':
         editor(argv[1])
     else:
