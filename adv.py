@@ -747,7 +747,6 @@ class Board:
         self.guards = [g]
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill1)
         p = Player(self, specials[3], id=ID.player)
-        print("p.char", p.char)
         Item(self, rock, '', specials[4], id=ID.stone3, type=Type.blocking)
         return p
 
@@ -1498,6 +1497,10 @@ class Being(BeingItemMixin):
         if put:
             B.put(self)
 
+    @property
+    def _name(self):
+        return self.name or self.__class__.__name__
+
     def update_refs(self):
         """Update references in `objects` in case there was a game load from a save"""
 
@@ -1853,14 +1856,14 @@ class Being(BeingItemMixin):
             loc = self.loc
             self.put(r)
             ro.put(loc)
-            status(f'{self} moved past {ro.name}')
+            status(f'{self} moved past {ro._name}')
         elif isinstance(lo, Being):
             B.remove(lo)
             B.remove(self)
             loc = self.loc
             self.put(l)
             lo.put(loc)
-            status(f'{self} moved past {lo.name}')
+            status(f'{self} moved past {lo._name}')
 
     def loot(self, B, cont):
         if cont.id==ID.treasure_chest and B.state==0:
