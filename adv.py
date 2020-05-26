@@ -12,7 +12,6 @@ TODO
 
 races: Spheros, Rabbibunnies, Quetches, Grobos
 """
-# import curses
 from bearlibterminal import terminal as blt
 import os
 import sys
@@ -2923,6 +2922,8 @@ class Saves:
 
         if name:
             fn = f'saves/{name}.data'
+        if not os.path.exists(fn):
+            return
 
         sh = shelve.open(fn, protocol=1)
         self.saves = sh['saves']
@@ -3258,15 +3259,12 @@ def parsekey(k):
         return k
     if k and blt.check(blt.TK_WCHAR) or k==blt.TK_RETURN:
         k = keymap.get(k)
-        print("k", k)
         if k and blt.state(blt.TK_SHIFT):
             k = k.upper()
-            print("k", k)
             if k=='-':
                 k = '_'
             if k=='/':
                 k = '?'
-            print("k", k)
         return k
 
 def handle_ui(B, player):
@@ -3366,7 +3364,11 @@ def handle_ui(B, player):
         debug(str(triggered_events))
     elif k == 'o':
         name = prompt()
-        player, B = Saves().load(name)
+        rv = Saves().load(name)
+        if rv:
+            player, B = rv
+        else:
+            player.talk(player, 'Saved game not found')
     elif k == 's':
         name = prompt()
         Saves().save(B.loc, name)
@@ -3723,7 +3725,5 @@ if __name__ == "__main__":
             load_game = a[2:]
     if first(argv) == 'ed':
         editor(argv[1])
-        # wrapper(editor, argv[1])
     else:
         main(load_game)
-        # wrapper(main, load_game)
