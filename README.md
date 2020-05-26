@@ -56,3 +56,10 @@ To play, first clone the repo, `git clone git@github.com:akulakov/little_adventu
     s - save game
     o - load game
     Q - quit
+
+# Window Size
+
+-s arg can be used to adjust tile size and therefore window size
+Default is 24, so to make a smaller window, you can run, e.g.:
+
+    python3 adv.py -s18
