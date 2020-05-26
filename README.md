@@ -55,4 +55,4 @@ To play, first clone the repo, `git clone git@github.com:akulakov/little_adventu
 
     s - save game
     o - load game
-    q - quit
+    Q - quit
