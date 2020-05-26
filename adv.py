@@ -1545,7 +1545,7 @@ class Being(BeingItemMixin):
             if yesno:
                 # TODO in some one-time dialogs, may need to detect 'no' explicitly
                 k = parsekey(blt.read())
-                return k in 'Yy'
+                return k in tuple('yY')
 
             elif multichoice:
                 for _ in range(2):
