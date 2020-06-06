@@ -1082,7 +1082,7 @@ class Board:
                         Item(self, NewBlocks.rubbish, 'pile of rubbish', loc, id=ID.rubbish1)
 
                     elif char == BL.books:
-                        Item(self, NewBlocks.books, 'books', loc)
+                        Item(self, NewBlocks.books[0], 'books', loc)
 
                     elif char == BL.open_book:
                         Item(self, NewBlocks.books[0], 'open book', loc)
@@ -1491,6 +1491,18 @@ class Being(BeingItemMixin):
             # prompt()
             self.B.draw()
 
+    def handle_directional_turn(self, dir, loc):
+        """Turn char based on which way it's facing."""
+        if hasattr(Blocks, name+'_r'):
+            to_r = False
+            if loc:
+                to_r = loc.x>self.loc.x
+            to_l = not to_r
+            if dir and dir =='l' or to_l:
+                self.char = getattr(Blocks, name+'_l')
+            else:
+                self.char = getattr(Blocks, name+'_r')
+
     def _move(self, dir, fly=False):
         m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0))[dir]
         if chk_oob(self.loc, *m):
@@ -1580,6 +1592,7 @@ class Being(BeingItemMixin):
             # this needs to be after previous block because the block looks at `top_obj` which would always be the being
             # instead of an event trigger item
             self.put(new)
+            self.handle_directional_turn(dir, new)
 
             if chk_oob(new.mod_d()) and B.found_type_at(Type.pressure_sensor, new.mod_d()):
                 if B.state==1:
@@ -3563,7 +3576,7 @@ def editor(_map):
                 elif cmd == 'gr': B.put(BL.guardrail_r, loc)
 
                 elif cmd == 'l':  B.put(BL.locker, loc)
-                elif cmd == 'b':  B.put(BL.books, loc)
+                elif cmd == 'b':  B.put(BL.books[0], loc)
                 elif cmd == 'ob': B.put(BL.books[0], loc)
                 elif cmd == 't':  B.put('t', loc)
                 elif cmd == 'f':  B.put(BL.fountain, loc)
