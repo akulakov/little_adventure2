@@ -2,13 +2,9 @@
 """
 bugs
     - fix bying of wine
-    - jolly roger flag in the museum (seems to be just unicode char weird transform??? - ok for now)
 
 TODO
-    - update stairs on screen 2
     - fast move attacks 5x in one turn
-    - fix jumping up one level
-    - at the ferry, RoboClone attacks even though should stay near the jail door
 
 races: Spheros, Rabbibunnies, Quetches, Grobos
 """
@@ -248,48 +244,52 @@ gnu_tiles = {k: 0xe400+n for n,k in enumerate(gnu_tiles)}
 # sys.exit()
 
 class Blocks:
-    circle3 = gnu_tiles['circle3']
-    tele_pod = gnu_tiles['tele_pod']
-    rock = gnu_tiles['rock']
-    lever = '-'
-    shelves = gnu_tiles['shelves']
-    ladder = gnu_tiles['ladder']
-    platform2 = gnu_tiles['block1']
-    platform_top = gnu_tiles['top-platform']
-    rock2 = gnu_tiles['white-sq']
+    circle3 = '\u20dd'
+    tele_pod = '\u2054'
+    rock = '\u2588'
+    lever = '\u256d'
+    shelves = '\u25a4'
+    ladder = '\u26c3'
+    platform2 = '\u23af'
+    platform_top = '\u23ba'
+    rock2 = '\u2337'
 
     platform = '▁'
-    bell = gnu_tiles['alarm']
-    grill = gnu_tiles['grill1']
-    rubbish = gnu_tiles['rubbish']
-    truck = noto_tiles['truck']
-    locker = gnu_tiles['cabinet']
-    grn_heart = gnu_tiles['heart'] # 2665
-    coin = gnu_tiles['circle1']
-    key = noto_tiles['key']
-    door = noto_tiles['door']
-    block1 = gnu_tiles['rock']
-    steps_r = gnu_tiles['step-r']
-    steps_l = gnu_tiles['step-l']
-    chair = gnu_tiles['chair']
-    fountain = noto_tiles['fountain']
-    stool = gnu_tiles['stool']
+    bell = '\u26c4'
+    grill = '\u2591'
+    rubbish = '\u26c1'
+    truck_l = '\u26c5'
+    truck_r = '\u26c6'
+
+    locker = '\u25eb'
+    grn_heart = '\u2665'
+    coin = '\u25c9'
+    key = '\u26bf'
+    door = '\u26bd'
+    block1 = '\u2587'
+    steps_r = '\u2692'
+    steps_l = '\u2693'
+    chair = '\u2694'
+    fountain = '\u2696'
+    stool = '\u2698'
     underline = '_'
-    cupboard = gnu_tiles['cabinet']
-    sunflower = noto_tiles['flower1']
-    magic_ball = gnu_tiles['circle2']
-    crate1 = gnu_tiles['crate1']
-    crate2 = gnu_tiles['crate2']
-    crate3 = gnu_tiles['crate3']
-    crate4 = gnu_tiles['crate4']
-    smoke_pipe = gnu_tiles['bars']
-    fireplace = '^'
-    water = gnu_tiles['water']
-    elephant = noto_tiles['elephant']     # Grobo
-    rabbit = noto_tiles['bull']
-    wine = '🍷'
-    dock_boards = gnu_tiles['dock-platform']
-    ticket_seller = '^'
+    cupboard = '\u269a'
+    sunflower = '\u269c'
+    magic_ball = '\u25cd'
+    crate1 = '\u25e7'
+    crate2 = '\u25e8'
+    crate3 = '\u25e9'
+    crate4 = '\u25ea'
+    smoke_pipe = '\u2551'
+    fireplace = '\u269e'
+    water = '\u224b'
+    elephant_l = '\u26c8'
+    elephant_r = '\u26c9'
+    rabbit_l = '\u26ca'
+    rabbit_r = '\u26cb'
+    wine = '\u26a0'
+    dock_boards = '\u2242'
+    ticket_seller = '\u26a1'
     ferry = noto_tiles['ship']
     ferry_ticket = 't'
     soldier = noto_tiles['soldier']
@@ -2970,7 +2970,7 @@ def dist(a,b):
 
 def main(load_game):
     blt.open()
-    blt.set(f"window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono2.ttf, size={SIZE}")
+    blt.set(f"window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono.ttf, size={SIZE}")
     blt.color("white")
     blt.composition(True)
 
@@ -3257,7 +3257,7 @@ keymap = dict(
     [ blt.TK_MINUS, '-' ],
     [ blt.TK_SLASH, '/' ],
     ]
-    )
+)
 
 def parsekey(k):
     if k==blt.TK_SHIFT:
