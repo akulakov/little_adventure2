@@ -176,6 +176,8 @@ class Blocks:
     player_r = '\u26d7'
     player_b = '\u26d8'
 
+    window = '\u2503'
+
     crates = (crate1, crate2, crate3, crate4)
 
 old_blocks_to_new = {}
@@ -183,10 +185,15 @@ new_blocks_to_old = {}
 for k,v in OldBlocks.__dict__.items():
     nv = None
     if isinstance(v, str):
-        nv = getattr(Blocks, v, None)
+        nv = getattr(Blocks, k, None)
     if nv:
         old_blocks_to_new[v] = nv
         new_blocks_to_old[nv] = v
+
+# print("OldBlocks.__dict__", OldBlocks.__dict__)
+# print("old_blocks_to_new", old_blocks_to_new)
+# print()
+# print("new_blocks_to_old", new_blocks_to_old)
 
 
 class Stance:
@@ -936,7 +943,7 @@ class Board:
                         Item(self, Blocks.rock, '', loc, type=Type.blocking, color=gray_col())
 
                     if char=='W':
-                        Item(self, Blocks.rock, '', loc, color='blue')   # window
+                        Item(self, Blocks.window, '', loc, color='blue')   # window
 
                     elif char=='D':
                         d = Item(self, Blocks.door, 'steel door', loc, type=Type.door2)
@@ -3579,7 +3586,9 @@ def editor(_map):
                 for row in B.B:
                     for cell in row:
                         a = cell[-1]
-                        a = new_blocks_to_old.get(a) or a
+                        print("a", a)
+                        a = new_blocks_to_old.get(str(a)) or a
+                        print("2: a", a)
                         fp.write(str(a))
                     fp.write('\n')
             written=1
