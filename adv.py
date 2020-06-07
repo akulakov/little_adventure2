@@ -48,103 +48,24 @@ class ObjectsByAttr:
 obj_by_attr = ObjectsByAttr()
 
 
-class OLDBlocks:
-
-    platform = '▁'
-    bell = '🔔'
-    grill = '▒'
-    rubbish = '♽'
-    truck = '🚚'
-    locker = '🔲'
-    grn_heart = '💚'
-    coin = '🌕'
-    key = '🔑'
+class OldBlocks:
     door = '🚪'
-    block1 = '▐'
     steps_r = '▞'
     steps_l = '▚'
-    platform_top = '▔'
     ladder = '☰'
-    honey = '🍯'
-    shelves = '☷'
-    chair = '⑁'
-    fountain = '‿'
-    small_table = '▿'
-    table2 = '⍡'
-    stool = '⍑'
-    underline = '▁'
     cupboard = '⌸'
-    sunflower = '🌻'
-    magic_ball = '❂'
-    crate1 = '◧'
-    crate2 = '◨'
-    crate3 = '◩'
-    crate4 = '◪'
-    smoke_pipe = '⧚'
-    fireplace = '⩟'
     water = '⏖'
-    elephant = '🐘'     # Grobo
+    elephant = '🐘'
     rabbit = '🐰'
-    wine = '🍷'
-    dock_boards = '⏔'
-    ticket_seller = '⌂'
-    ferry = '🚤'
-    ferry_ticket = 't'
     soldier = '⍾'
-    bars = '┇'
     tree1 = '🌲'
     tree2 = '🌳'
-    books = '📚'
-    open_book = '📖'
-    guardrail_l = '╔'
-    guardrail_r = '╕'
-    guardrail_m = '╤'
     tulip = '🌷'
-    monkey = '🐵'
-    antitank = '⋇'
-    red_circle = '🔴'
-    # rock2 = '║'
     rock2 = '▧'
-    rock3 = '▓'
     platform2 = '▭'
-    angled1 = '╱'
-    angled2 = '╲'
-    picture = '🖼'
-    hexagon = '⎔'
-    car = '🚗'
-    blue_round = '🔵' # unused
-    bottle = '℧'
-    box1 = '⊟'
-    cactus = '🌵'
-    lever = '⎆'
-    statue = 'Ω'
-    sharp_rock = '⩕'
-    runes = '⩰'
-    cow = '🐮'
-    hair_dryer = 'D'
-    proto_pack = 'P'
-    flag = '▶'
-    steering_wheel = '⎈'
-    horn = '📯'
-    medallion = '◉'
-    seal = '⏣'
-    special_stone = '⏢'
-    flute = 'f'
-    snowman = '☃'
-    snowflake = '❄'
-    dynofly = 'D'
-    safe = '⊡'
-    saber = ')'
-    pod = '≃'
-    computer = '💻'
-    # zoe = '👩'
-    zoe = 'Z'
-    funfrock = 'F'
-
-    crates = (crate1, crate2, crate3, crate4)
 
 class Blocks:
-    circle3 = '\u20dd'
+    circle3 = '\u25cc'
     tele_pod = '\u2054'
     rock = '\u2588'
     lever = '\u26dd'
@@ -214,13 +135,11 @@ class Blocks:
     tulip = '\u26b2'
     monkey = '\u26d0'
     antitank = '\u2042'
-    # rock2 = '║'
 
     #---------------
     rock3 = '\u2593'
     angled1 = '\u26da'
     angled2 = '\u26db'
-    # picture = noto_tiles['picture']
     picture = '\u26b4'
     bottle = '\u26b9'
     box1 = '\u25a4'
@@ -258,7 +177,17 @@ class Blocks:
     player_b = '\u26d8'
 
     crates = (crate1, crate2, crate3, crate4)
-NewBlocks = Blocks
+
+old_blocks_to_new = {}
+new_blocks_to_old = {}
+for k,v in OldBlocks.__dict__.items():
+    nv = None
+    if isinstance(v, str):
+        nv = getattr(Blocks, v, None)
+    if nv:
+        old_blocks_to_new[v] = nv
+        new_blocks_to_old[nv] = v
+
 
 class Stance:
     normal = 1
@@ -663,7 +592,7 @@ class Board:
         self.guards = [g]
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill1)
         p = Player(self, specials[3], id=ID.player)
-        Item(self, rock, '', specials[4], id=ID.stone3, type=Type.blocking)
+        Item(self, rock, '', specials[4], id=ID.stone3, type=Type.blocking, color=gray_col())
         return p
 
     def board_und2(self):
@@ -720,7 +649,7 @@ class Board:
     def board_7(self):
         self.labels.append((10,5, "The Ferry"))
         containers, crates, doors, specials = self.load_map(self._map)
-        julien, clone1 = specials[NewBlocks.elephant_l]
+        julien, clone1 = specials[Blocks.elephant_l]
         # key3 = Item(self, Blocks.key, 'key', id=ID.key3, put=0)
         clone1.inv[ID.key3] = 1
         julien.id = ID.julien
@@ -769,7 +698,7 @@ class Board:
         Item(self, '', '', specials[1].mod(0,-2), id=ID.talk_to_brenne)
         Item(self, Blocks.safe, 'Safe', specials[2], id=ID.safe)
         d=self.doors[1]
-        d.id = ID.blue_door; d.type=Type.door3
+        d.id = ID.blue_door; d.type=Type.door3; d.color='blue'
 
 
     def board_13(self):
@@ -917,7 +846,7 @@ class Board:
         RoboBunny(self, specials[2], id=ID.painter, name='Jaca')
         Item(self, rock, '', specials[3], id=ID.stone2, type=Type.blocking)
         for n in range(4,7):
-            Item(self, Blocks.tele_pod, 'Teleportation Pod', specials[n], type=Type.pod)
+            Item(self, Blocks.pod, 'Teleportation Pod', specials[n], type=Type.pod)
         Item(self, Blocks.computer, 'Computer', specials[7], id=ID.computer)
 
     def board_estone(self):
@@ -931,7 +860,7 @@ class Board:
         Item(self, Blocks.flag, 'Jolly Roger', specials[9], id=ID.pirate_flag)
         Being(self, specials[2], id=ID.alarm_tech, name='Alarm Technician', char='elephant')
         for loc in self.line(specials[3], specials[4]):
-            Item(self, rock, '', loc, type=Type.pressure_sensor)
+            Item(self, rock, '', loc, type=Type.pressure_sensor, color=gray_col())
 
         self.museum_patrons = [
             Being(self, specials[6], name='Museum patron', char='elephant'),
@@ -941,14 +870,14 @@ class Board:
         containers[0].id = ID.treasure_chest
         k = Item(None, Blocks.key, 'Golden Key', id=ID.golden_key)
         containers[0].inv[ID.golden_key] = 1
-        self[Loc(60,8)].color = 'yellow'
+        containers[0].color = 'yellow'
 
     def board_prox_und(self):
         containers, crates, doors, specials = self.load_map(self._map)
 
     def board_himalaya1(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Item(self, Blocks.door, '', specials[1], type=Type.door3, id=ID.red_door)
+        Item(self, Blocks.door, '', specials[1], type=Type.door3, id=ID.red_door, color='red')
 
     def board_himalaya2(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -997,8 +926,6 @@ class Board:
         self.containers = containers = []
         self.doors = doors = []
         self.specials = specials = defaultdict(list)
-        Blocks = OLDBlocks
-        BL=Blocks
 
         for y in range(HEIGHT):
             for x in range(79):
@@ -1006,144 +933,143 @@ class Board:
                 loc = Loc(x,y)
                 if char != blank:
                     if char==rock:
-                        # self.put(rock, loc)
-                        Item(self, NewBlocks.rock, '', loc, type=Type.blocking)
-                    elif char==Blocks.ladder:
-                        Item(self, NewBlocks.ladder, 'ladder', loc, type=Type.ladder)
+                        Item(self, Blocks.rock, '', loc, type=Type.blocking, color=gray_col())
 
-                    elif char==Blocks.door or char=='d':
-                        d = Item(self, NewBlocks.door, 'door', loc, type=Type.door1)
-                        doors.append(d)
+                    if char=='W':
+                        Item(self, Blocks.rock, '', loc, color='blue')   # window
 
                     elif char=='D':
-                        d = Item(self, NewBlocks.door, 'steel door', loc, type=Type.door2)
+                        d = Item(self, Blocks.door, 'steel door', loc, type=Type.door2)
                         doors.append(d)
 
                     elif char=='g':
-                        Item(self, NewBlocks.grn_heart, 'grn_heart', loc, id=ID.grn_heart)
+                        Item(self, Blocks.grn_heart, 'grn_heart', loc, id=ID.grn_heart)
 
                     elif char==Blocks.locker or char=='o':
                         l = Locker(self, loc)
                         containers.append(l)
 
-                    elif char==Blocks.cupboard or char=='c':
-                        c = Cupboard(self, loc)
-                        containers.append(c)
-
-                    elif char in Blocks.crates or char=='C':
-                        c = Item(self, choice(NewBlocks.crates), 'crate', loc)
+                    elif char=='C':
+                        c = Item(self, choice(Blocks.crates), 'crate', loc)
                         crates.append(c)
 
                     elif char=='s':
-                        Item(self, NewBlocks.sunflower, 'sunflower', loc)
+                        Item(self, Blocks.sunflower, 'sunflower', loc)
 
                     elif char==Blocks.sharp_rock:
-                        Item(self, NewBlocks.sharp_rock, 'sharp_rock', loc, type=Type.deadly)
+                        Item(self, Blocks.sharp_rock, 'sharp_rock', loc, type=Type.deadly)
 
-                    elif char == BL.snowman:
-                        Item(self, NewBlocks.snowman, 'snowman', loc)
-                    elif char == BL.snowflake:
-                        Item(self, NewBlocks.snowflake, 'snowflake', loc)
+                    elif char == Blocks.snowman:
+                        Item(self, Blocks.snowman, 'snowman', loc)
+                    elif char == Blocks.snowflake:
+                        Item(self, Blocks.snowflake, 'snowflake', loc)
 
                     elif char==Blocks.rock3:
-                        Item(self, NewBlocks.rock3, 'rock', loc, type=Type.blocking)
+                        Item(self, Blocks.rock3, 'rock', loc, type=Type.blocking)
 
                     elif char==Blocks.block1:
-                        Item(self, NewBlocks.block1, 'block', loc, type=Type.door_top_block)
+                        Item(self, Blocks.block1, 'block', loc, type=Type.door_top_block)
 
                     elif char==Blocks.smoke_pipe:
-                        Item(self, NewBlocks.smoke_pipe, 'smoke pipe', loc, type=Type.ladder)
+                        Item(self, Blocks.smoke_pipe, 'smoke pipe', loc, type=Type.ladder)
 
                     elif char==Blocks.cactus:
-                        Item(self, NewBlocks.cactus, 'cactus', loc, color='green')
+                        col = rand_color(33, (60,255), (10,140))
+                        Item(self, Blocks.cactus, 'cactus', loc, color=col)
 
                     elif char==Blocks.fireplace:
-                        Item(self, NewBlocks.fireplace, 'fireplace', loc)
-
-                    elif char==Blocks.water:
-                        Item(self, NewBlocks.water, 'water', loc, type=Type.water)
+                        Item(self, Blocks.fireplace, 'fireplace', loc)
 
                     elif char==Blocks.stool:
-                        Item(self, NewBlocks.stool, 'bar stool', loc)
+                        Item(self, Blocks.stool, 'bar stool', loc)
 
                     elif char=='t':
-                        Item(self, NewBlocks.tulip, 'tulip', loc)
+                        Item(self, Blocks.tulip, 'tulip', loc)
 
                     elif char==Blocks.antitank:
-                        Item(self, NewBlocks.antitank, 'antitank hedgehog obstacle', loc)
+                        Item(self, Blocks.antitank, 'antitank hedgehog obstacle', loc)
 
                     elif char==Blocks.fountain:
-                        Item(self, NewBlocks.fountain, 'water fountain basin', loc)
+                        Item(self, Blocks.fountain, 'water fountain basin', loc)
 
                     elif char==Blocks.dock_boards:
-                        Item(self, NewBlocks.dock_boards, 'dock boards', loc, type=Type.blocking)
+                        Item(self, Blocks.dock_boards, 'dock boards', loc, type=Type.blocking)
 
                     elif char==Blocks.grill:
-                        Item(self, NewBlocks.grill, 'barred window', loc)
+                        Item(self, Blocks.grill, 'barred window', loc)
 
                     elif char==Blocks.rubbish:
-                        Item(self, NewBlocks.rubbish, 'pile of rubbish', loc, id=ID.rubbish1)
+                        Item(self, Blocks.rubbish, 'pile of rubbish', loc, id=ID.rubbish1)
 
-                    elif char == BL.books:
-                        Item(self, choice(NewBlocks.books), 'books', loc)
+                    elif char == Blocks.books[0]:
+                        Item(self, choice(Blocks.books), 'book', loc)
 
-                    elif char == BL.open_book:
-                        Item(self, NewBlocks.books[0], 'open book', loc)
-
-                    elif char == BL.tree1:
-                        col = '#ff33%s%s' % (
-                            hex(randrange(60,255))[2:],
-                            hex(randrange(10,140))[2:],
-                        )
-                        Item(self, NewBlocks.tree1, 'tree', loc, color=col)
-
-                    elif char == BL.tree2:
-                        col = '#ff33%s%s' % (
-                            hex(randrange(60,255))[2:],
-                            hex(randrange(10,140))[2:],
-                        )
-                        Item(self, NewBlocks.tree2, 'tree', loc, color=col)
+                    elif char == Blocks.books[1]:
+                        Item(self, Blocks.books[1], 'book', loc)
 
                     elif char==Blocks.shelves:
-                        s = Item(self, NewBlocks.shelves, 'shelves', loc, type=Type.container)
+                        s = Item(self, Blocks.shelves, 'shelves', loc, type=Type.container)
                         containers.append(s)
 
-                    elif char==Blocks.ferry:
+                    elif char==Blocks.ferry_l:
                         Item(self, 'ferry', 'ferry', loc, id=ID.ferry)
 
                     elif char==Blocks.bars:
-                        Item(self, NewBlocks.bars, 'jail bars', loc, type=Type.blocking)
+                        Item(self, Blocks.bars, 'jail bars', loc, type=Type.blocking)
 
                     elif char=='/':
-                        Item(self, NewBlocks.angled1, '', loc, type=Type.blocking)
+                        Item(self, Blocks.angled1, '', loc, type=Type.blocking)
 
                     elif char=='\\':
-                        Item(self, NewBlocks.angled2, '', loc, type=Type.blocking)
+                        Item(self, Blocks.angled2, '', loc, type=Type.blocking)
 
-                    elif char==Blocks.rock2:
-                        Item(self, NewBlocks.rock2, '', loc)
+                    # -----------------------------------------------------------------------------------------------
+                    elif char == OldBlocks.tree1:
+                        col = rand_color(33, (60,255), (10,140))
+                        Item(self, Blocks.tree1, 'tree', loc, color=col)
 
-                    elif char==Blocks.platform_top:
-                        specials[NewBlocks.platform_top] = loc
-                        if for_editor:
-                            self.put(NewBlocks.platform_top, loc)
+                    elif char == OldBlocks.tree2:
+                        col = rand_color(33, (60,255), (10,140))
+                        Item(self, Blocks.tree2, 'tree', loc, color=col)
 
-                    elif char==Blocks.steps_l:
-                        Item(self, NewBlocks.steps_l, '', loc, type=Type.blocking)
+                    elif char==OldBlocks.ladder:
+                        Item(self, Blocks.ladder, 'ladder', loc, type=Type.ladder, color=gray_col())
 
-                    elif char==Blocks.steps_r:
-                        Item(self, NewBlocks.steps_r, '', loc, type=Type.blocking)
+                    elif char==OldBlocks.door or char=='d':
+                        d = Item(self, Blocks.door, 'door', loc, type=Type.door1)
+                        doors.append(d)
 
-                    elif char==Blocks.platform2:
-                        Item(self, NewBlocks.platform2, '', loc, type=Type.blocking)
+                    elif char==OldBlocks.rock2:
+                        Item(self, Blocks.rock2, '', loc)
 
-                    elif char==Blocks.elephant:
+                    # elif char==OldBlocks.platform_top:
+                    #     specials[Blocks.platform_top] = loc
+                    #     if for_editor:
+                    #         self.put(Blocks.platform_top, loc)
+
+                    elif char==OldBlocks.steps_l:
+                        Item(self, Blocks.steps_l, '', loc, type=Type.blocking, color=gray_col())
+
+                    elif char==OldBlocks.steps_r:
+                        Item(self, Blocks.steps_r, '', loc, type=Type.blocking, color=gray_col())
+
+                    elif char==OldBlocks.platform2:
+                        Item(self, Blocks.platform2, '', loc, type=Type.blocking)
+
+                    elif char==OldBlocks.elephant:
                         g = Grobo(self, loc)
-                        specials[NewBlocks.elephant_l].append(g)
+                        specials[Blocks.elephant_l].append(g)
 
-                    elif char==Blocks.soldier:
+                    elif char==OldBlocks.water:
+                        Item(self, Blocks.water, 'water', loc, type=Type.water)
+
+                    elif char==OldBlocks.soldier:
                         s = Soldier(self, loc)
                         self.soldiers.append(s)
+
+                    elif char==OldBlocks.cupboard or char=='c':
+                        c = Cupboard(self, loc)
+                        containers.append(c)
 
                     elif char in '0123456789':
                         specials[int(char)] = loc
@@ -1264,6 +1190,20 @@ class Board:
             Windows.win.addstr(Y+y+1, X, ' ' + ln)
         Windows.refresh()
         blt.read()
+
+def gray_col():
+    c = hex(randrange(120,150))[2:]
+    return '#ff%s%s%s' % (c,c,c)
+
+def rand_color(r, g, b):
+    r = (r,r+1) if isinstance(r,int) else r
+    g = (g,g+1) if isinstance(g,int) else g
+    b = (b,b+1) if isinstance(b,int) else b
+    return '#ff%s%s%s' % (
+        hex(randrange(*r))[2:],
+        hex(randrange(*g))[2:],
+        hex(randrange(*b))[2:],
+    )
 
 def chk_oob(loc, y=0, x=0):
     return 0 <= loc.y+y <= HEIGHT-1 and 0 <= loc.x+x <= 78
@@ -1510,17 +1450,17 @@ class Being(BeingItemMixin):
     def handle_directional_turn(self, dir, loc):
         """Turn char based on which way it's facing."""
         print("self.char", self.char)
-        if hasattr(Blocks, self.char) and self.char[-2:] in ('_r','_l','_f', '_b'):
+        if hasattr(Blocks, self.char) and self.char[-2:] in ('_r','_l','_f','_b'):
             print('in handle_directional_turn()')
-            to_r = False
+            to_r = to_l = False
             if loc:
                 to_r = loc.x>self.loc.x
+                to_l = loc.x<self.loc.x
             print("to_r", to_r)
             print("dir", dir)
-            to_l = not to_r
             if dir and dir =='l' or to_r:
                 self.char = self.char[:-2]+'_r'
-            else:
+            elif dir and dir =='h' or to_l:
                 self.char = self.char[:-2]+'_l'
             print("self.char", self.char)
 
@@ -1861,6 +1801,7 @@ class Being(BeingItemMixin):
         B=self.B
         cont = last( [x for x in B.get_all_obj(self.loc) if x.type==Type.container] )
         ids = B.get_all_obj(self.loc)
+        self.char = 'player_f'
 
         r,l = self.loc.mod_r(), self.loc.mod_l()
         rd, ld = r.mod_d(), l.mod_d()
@@ -2829,7 +2770,7 @@ class Clone(Being):
     char = 'elephant'
 
 class ShopKeeper(Being):
-    char = NewBlocks.monkey
+    char = Blocks.monkey
 
 class Grobo(Being):
     char = 'elephant'
@@ -3476,15 +3417,15 @@ print=debug
 
 def editor(_map):
     blt.open()
-    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: Andale.ttf, size=24")
+    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono.ttf, size=24")
     blt.color("white")
     blt.composition(True)
 
     # blt.set("U+E200: Tiles.png, size=24x24, align=top-left")
     # blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
     # blt.set("U+E300: fontello.ttf, size=16x16, spacing=3x2, codepage=cp.txt")
-    blt.set("U+E300: NotoEmoji-Regular.ttf, size=32x32, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
-    blt.set("U+E400: FreeMono2.ttf, size=32x32, spacing=3x2, codepage=monocp.txt, align=top-left")           # GNU
+    # blt.set("U+E300: NotoEmoji-Regular.ttf, size=32x32, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
+    # blt.set("U+E400: FreeMono2.ttf, size=32x32, spacing=3x2, codepage=monocp.txt, align=top-left")           # GNU
 
     blt.clear()
     blt.color("white")
@@ -3607,6 +3548,7 @@ def editor(_map):
                 elif cmd == 'f':  B.put(BL.fountain, loc)
                 elif cmd == 'a':  B.put(BL.antitank, loc)
                 elif cmd == 'p':  B.put(BL.platform2, loc)
+                elif cmd == 'w':  B.put('W', loc)   # window
 
                 elif cmd == 'oc':  B.put(BL.car, loc)
 
@@ -3631,16 +3573,13 @@ def editor(_map):
                 B.B[-1][-1].append('_')
         elif k == 'f':
             B.put(Blocks.shelves, loc)
+
         elif k == 'W':
-            val_to_k = {v:k for k,v in Blocks.__dict__.items()}
             with open(f'maps/{_map}.map', 'w') as fp:
                 for row in B.B:
                     for cell in row:
                         a = cell[-1]
-                        char = getattr(a, 'char', None)
-                        if char and isinstance(char,int) and char>500:
-                            k = val_to_k[char]
-                            a = getattr(OLDBlocks, k)
+                        a = new_blocks_to_old.get(a) or a
                         fp.write(str(a))
                     fp.write('\n')
             written=1
