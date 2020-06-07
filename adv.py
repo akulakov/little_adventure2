@@ -490,7 +490,7 @@ conversations = {
 
     ID.fenioux: ["Wait, how did you get in here? Who are you??", "I'm the heir, just like in the Prophecy... You know, the Legend! It's true!", "I'm happy for you, Twinsen! My brother is being held in Dr. FunFrock's headquarters, but his window is facing outside. If you can talk to him and find out how he's doing, I will give you the red card as a small token of gratitude."],
 
-    ID.fenioux2: ['I spoke to your brother.. he told me to mention the word "Amos" to you..', 'Very well, here is the red card..'],
+    ID.fenioux2: ['I spoke to your brother.. he told me to mention the word "Amos" to you..', "Very well, I think you'll find more use for this card than I will!"],
 
     ID.alarm_tech: ['I am almost done setting up the alarm system for the museum! Whenever it is activated, the Marine Museum would be evacuated and the doors are locked. But that is not all! There will be pressure sensitive tiles before the most valuable exhibits, anyone who steps on one of them, will summon plenty of GroboClones who will make quick handywork of the intruder,  he-he, heh heh, HA!'],
 
