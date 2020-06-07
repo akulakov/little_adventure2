@@ -132,7 +132,14 @@ class Blocks:
     guardrail_l = '╔'
     guardrail_r = '╕'
     guardrail_m = '╤'
-    tulip = '\u26b2'
+    tulip = '\u26b3'
+    flowers = [
+        '\u0088',
+        '\u0089',
+        '\u008a',
+        '\u008b',
+        '\u008c',
+    ]
     monkey = '\u26d0'
     antitank = '\u2042'
 
@@ -948,6 +955,10 @@ class Board:
                     elif char=='D':
                         d = Item(self, Blocks.door, 'steel door', loc, type=Type.door2)
                         doors.append(d)
+
+                    elif char in Blocks.flowers:
+                        col = rand_color((60,200), (60,200), (60,200))
+                        Item(self, char, 'flower', loc, color=col)
 
                     elif char=='g':
                         Item(self, Blocks.grn_heart, 'grn_heart', loc, id=ID.grn_heart)
@@ -3535,9 +3546,11 @@ def editor(_map):
             B.put(Blocks.snowflake, loc)
         elif k == 'V':
             B.put(Blocks.snowman, loc)
+        elif k == 'f':
+            B.put(choice(Blocks.flowers), loc)
 
         elif k == 'o':
-            cmds = 'gm gl gr l b ob f'.split()
+            cmds = 'gm gl gr l b ob f C'.split()
             cmd = ''
             BL=Blocks
             while 1:
@@ -3555,6 +3568,7 @@ def editor(_map):
                 elif cmd == 'f':  B.put(BL.fountain, loc)
                 elif cmd == 'a':  B.put(BL.antitank, loc)
                 elif cmd == 'p':  B.put(BL.platform2, loc)
+                elif cmd == 'C':  B.put('C', loc)   # crate -- note 'C' shortcut adds cactus
                 elif cmd == 'w':  B.put('W', loc)   # window
 
                 elif cmd == 'oc':  B.put(BL.car, loc)
@@ -3588,6 +3602,8 @@ def editor(_map):
                         a = cell[-1]
                         print("a", a)
                         a = new_blocks_to_old.get(str(a)) or a
+                        if str(a) in Blocks.crates:
+                            a = 'C'
                         print("2: a", a)
                         fp.write(str(a))
                     fp.write('\n')
