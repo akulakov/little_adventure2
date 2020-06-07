@@ -13,7 +13,7 @@ import os
 import sys
 from copy import copy, deepcopy
 from time import sleep
-from random import random, choice
+from random import random, choice, randrange
 from collections import defaultdict
 from textwrap import wrap
 import string
@@ -147,7 +147,7 @@ class Blocks:
     circle3 = '\u20dd'
     tele_pod = '\u2054'
     rock = '\u2588'
-    lever = '\u256d'
+    lever = '\u26dd'
     shelves = '\u25a4'
     ladder = '\u26c3'
     platform2 = '\u23af'
@@ -201,11 +201,11 @@ class Blocks:
     tree1 = '\u2689'
     tree2 = '\u268a'
     books = [
-        '\u26ac'
-        '\u26ad'
-        '\u26ae'
-        '\u26af'
-        '\u26b0'
+        '\u26ac',
+        '\u26ad',
+        '\u26ae',
+        '\u26af',
+        '\u26b0',
         ]
 
     guardrail_l = '╔'
@@ -218,8 +218,8 @@ class Blocks:
 
     #---------------
     rock3 = '\u2593'
-    angled1 = '\u2571'
-    angled2 = '\u2572'
+    angled1 = '\u26da'
+    angled2 = '\u26db'
     # picture = noto_tiles['picture']
     picture = '\u26b4'
     bottle = '\u26b9'
@@ -235,8 +235,8 @@ class Blocks:
     proto_pack = 'P'
 
     flag = '\u26a3'
-    horn = 'H'
-    medallion = 'M'
+    horn = '\u26de'
+    medallion = '\u232c'
     seal = '\u25d9'
     special_stone = '\u16a5'
     flute = '\u26a5'
@@ -249,12 +249,13 @@ class Blocks:
     saber = '\u26a9'
     pod = '\u26ba'
     computer = '\u26bc'
-    zoe = '\u26d2'
+    zoe = '\u26ff'
     funfrock = '\u26d3'
 
     player_f = '\u26d5'
     player_l = '\u26d6'
     player_r = '\u26d7'
+    player_b = '\u26d8'
 
     crates = (crate1, crate2, crate3, crate4)
 NewBlocks = Blocks
@@ -727,7 +728,7 @@ class Board:
         doors[0].type = Type.door3
         Item(self, Blocks.grill, 'grill', specials[1], id=ID.grill4)
         Item(self, Blocks.ticket_seller, 'Ticket seller booth', specials[2], id=ID.ticket_seller1)
-        Item(self, Blocks.ferry_l, 'Ferry', specials[8], id=ID.ferry)
+        Item(self, 'ferry', 'Ferry', specials[8], id=ID.ferry)
         # invisible, with ferry id to be able to take the ferry near this tile
         # Item(self, '', '', specials[3], id=ID.ferry)
 
@@ -783,9 +784,9 @@ class Board:
         Being(self, specials[1], id=ID.montbard, name='Montbard', char=Blocks.monkey)
         Being(self, specials[2], id=ID.morvan, name='du Morvan', char=Blocks.monkey)
         Being(self, specials[3], id=ID.astronomer, name='The Astronomer', char=Blocks.monkey)
-        Being(self, specials[4], id=ID.groboclone1, name='Groboclone', char=Blocks.elephant_l)
-        Being(self, specials[7], id=ID.locksmith, name='Locksmith', char=Blocks.elephant_l)
-        Being(self, specials[9], id=ID.aubigny, name='Aubigny', char=Blocks.rabbit_l)
+        Being(self, specials[4], id=ID.groboclone1, name='Groboclone', char='elephant')
+        Being(self, specials[7], id=ID.locksmith, name='Locksmith', char='elephant')
+        Being(self, specials[9], id=ID.aubigny, name='Aubigny', char='rabbit')
 
         Item(self, Blocks.fountain, 'sink', specials[5], id=ID.sink)
         Item(self, Blocks.picture, 'A Drawing with a romantic view and a horse galloping at full speed across the plain', specials[6], id=ID.drawing)
@@ -795,14 +796,14 @@ class Board:
 
     def board_top3(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Item(self, Blocks.car_l, 'Car', specials[8], id=ID.car)
+        Item(self, 'car', 'Car', specials[8], id=ID.car)
         self[Loc(50,11)].color = 'blue'
 
     def board_beluga(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        s=Item(self, Blocks.ferry_l, 'Sailboat', specials[8], id=ID.sailboat)
+        s=Item(self, 'ferry', 'Sailboat', specials[8], id=ID.sailboat)
         s.state=1
-        Being(self, specials[3], id=ID.buzancais, name='Buzancais', char=Blocks.cow_l)
+        Being(self, specials[3], id=ID.buzancais, name='Buzancais', char='cow')
         self[Loc(41,6 )].color = 'blue'
 
     # -- White Leaf Desert --------------------------------------------------------------------------
@@ -818,7 +819,7 @@ class Board:
 
     def board_desert2(self):
         specials = self.load_map(self._map)[3]
-        Being(self, specials[1], id=ID.olivet, name='Olivet', char=Blocks.rabbit_l)
+        Being(self, specials[1], id=ID.olivet, name='Olivet', char='rabbit')
         Item(self, Blocks.seal, 'strange seal', specials[2], id=ID.seal_sendell)
         lrange = lambda *x: list(range(*x))
         for x in lrange(3,20) + lrange(23,27) + lrange(35,60) + lrange(65,78):
@@ -827,7 +828,7 @@ class Board:
     def board_elf_lab(self):
         containers, crates, doors, specials = self.load_map(self._map)
         Item(self, Blocks.grill, 'grill', specials[1], id=ID.grill9)
-        Being(self, specials[2], id=ID.elf, name='Lege-cap-ferret the Elf', char=Blocks.rabbit_l)
+        Being(self, specials[2], id=ID.elf, name='Lege-cap-ferret the Elf', char='rabbit')
 
     def board_des_und(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -865,22 +866,22 @@ class Board:
     def board_proxima1(self):
 
         containers, crates, doors, specials = self.load_map(self._map)
-        Being(self, specials[2], id=ID.ruffec, name='Ruffec', char=Blocks.cow_l)
+        Being(self, specials[2], id=ID.ruffec, name='Ruffec', char='cow')
         for loc in self.line(Loc(61,7), Loc(67,7)):
             self[loc].color = 'green'
 
     def board_proxima2(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Being(self, specials[1], id=ID.baldino, name='James Baldino', char=Blocks.rabbit_l)
+        Being(self, specials[1], id=ID.baldino, name='James Baldino', char='rabbit')
         doors[0].type = Type.door3
         Item(self, Blocks.ladder, '', specials[5], type=Type.ladder)
         Item(self, Blocks.door, '', specials[5], type=Type.door2)
         TriggerEventLocation(self, specials[2], evt=RoboCloneAppearEvent)
-        Being(self, specials[3], id=ID.fenioux, name='Fenioux', char=Blocks.cow_l)
+        Being(self, specials[3], id=ID.fenioux, name='Fenioux', char='cow')
 
     def board_proxima3(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Being(self, specials[1], id=ID.salesman, name='Salesman', char=Blocks.rabbit_l)
+        Being(self, specials[1], id=ID.salesman, name='Salesman', char='rabbit')
 
     def board_proxima4(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -899,7 +900,7 @@ class Board:
 
     def board_f_island(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Being(self, specials[1], id=ID.tartas, name='Tartas', char=Blocks.rabbit_l)
+        Being(self, specials[1], id=ID.tartas, name='Tartas', char='rabbit')
 
     def board_f_island2(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -928,13 +929,15 @@ class Board:
         Item(self, Blocks.lever, 'Museum Alarm', specials[1], id=ID.museum_alarm)
         Item(self, Blocks.door, '', specials[5], id=ID.museum_door, type=Type.door1)
         Item(self, Blocks.flag, 'Jolly Roger', specials[9], id=ID.pirate_flag)
-        Being(self, specials[2], id=ID.alarm_tech, name='Alarm Technician', char=Blocks.elephant_l)
+        Being(self, specials[2], id=ID.alarm_tech, name='Alarm Technician', char='elephant')
         for loc in self.line(specials[3], specials[4]):
             Item(self, rock, '', loc, type=Type.pressure_sensor)
 
-        Being(self, specials[6], name='Museum patron', char=Blocks.elephant_l)
-        Being(self, specials[7], name='Museum patron', char=Blocks.rabbit_l)
-        Being(self, specials[8], name='Museum patron', char=Blocks.monkey)
+        self.museum_patrons = [
+            Being(self, specials[6], name='Museum patron', char='elephant'),
+            Being(self, specials[7], name='Museum patron', char='rabbit'),
+            Being(self, specials[8], name='Museum patron', char=Blocks.monkey),
+        ]
         containers[0].id = ID.treasure_chest
         k = Item(None, Blocks.key, 'Golden Key', id=ID.golden_key)
         containers[0].inv[ID.golden_key] = 1
@@ -958,12 +961,12 @@ class Board:
 
     def board_bar(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Being(self, specials[1], name='Sever', char=Blocks.elephant_l, id=ID.sever)
+        Being(self, specials[1], name='Sever', char='elephant', id=ID.sever)
         Item(self, rock, '', specials[2], id=ID.stone1, type=Type.blocking)
 
     def board_dynofly(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Being(self, specials[1], name='Dynofly', char=Blocks.dynofly_l, id=ID.dynofly)
+        Being(self, specials[1], name='Dynofly', char='dynofly', id=ID.dynofly)
 
     # -----------------------------------------------------------------------------------------------
 
@@ -979,7 +982,7 @@ class Board:
 
     def board_sea1(self):
         specials = self.load_map(self._map)[3]
-        Item(self, Blocks.ferry_l, 'ferry', specials[1], id=ID.ferry)
+        Item(self, 'ferry', 'ferry', specials[1], id=ID.ferry)
 
     def board_landscape1(self):
         self.load_map(self._map)
@@ -1052,7 +1055,7 @@ class Board:
                         Item(self, NewBlocks.smoke_pipe, 'smoke pipe', loc, type=Type.ladder)
 
                     elif char==Blocks.cactus:
-                        Item(self, NewBlocks.cactus, 'cactus', loc)
+                        Item(self, NewBlocks.cactus, 'cactus', loc, color='green')
 
                     elif char==Blocks.fireplace:
                         Item(self, NewBlocks.fireplace, 'fireplace', loc)
@@ -1082,31 +1085,39 @@ class Board:
                         Item(self, NewBlocks.rubbish, 'pile of rubbish', loc, id=ID.rubbish1)
 
                     elif char == BL.books:
-                        Item(self, NewBlocks.books[0], 'books', loc)
+                        Item(self, choice(NewBlocks.books), 'books', loc)
 
                     elif char == BL.open_book:
                         Item(self, NewBlocks.books[0], 'open book', loc)
 
                     elif char == BL.tree1:
-                        Item(self, NewBlocks.tree1, 'tree', loc)
+                        col = '#ff33%s%s' % (
+                            hex(randrange(60,255))[2:],
+                            hex(randrange(10,140))[2:],
+                        )
+                        Item(self, NewBlocks.tree1, 'tree', loc, color=col)
 
                     elif char == BL.tree2:
-                        Item(self, NewBlocks.tree2, 'tree', loc)
+                        col = '#ff33%s%s' % (
+                            hex(randrange(60,255))[2:],
+                            hex(randrange(10,140))[2:],
+                        )
+                        Item(self, NewBlocks.tree2, 'tree', loc, color=col)
 
                     elif char==Blocks.shelves:
                         s = Item(self, NewBlocks.shelves, 'shelves', loc, type=Type.container)
                         containers.append(s)
 
                     elif char==Blocks.ferry:
-                        Item(self, NewBlocks.ferry_l, 'ferry', loc, id=ID.ferry)
+                        Item(self, 'ferry', 'ferry', loc, id=ID.ferry)
 
                     elif char==Blocks.bars:
                         Item(self, NewBlocks.bars, 'jail bars', loc, type=Type.blocking)
 
-                    elif char==Blocks.angled1:
-                        Item(self, NewBlocks.angled1, '', loc)
+                    elif char=='/':
+                        Item(self, NewBlocks.angled1, '', loc, type=Type.blocking)
 
-                    elif char==Blocks.angled2:
+                    elif char=='\\':
                         Item(self, NewBlocks.angled2, '', loc, type=Type.blocking)
 
                     elif char==Blocks.rock2:
@@ -1277,6 +1288,11 @@ class BeingItemMixin:
 
     def __str__(self):
         c=self.char
+        if isinstance(c, str) and len(c)>1:
+            if '_' not in c:
+                c += '_l'
+                self.char = c
+            c = getattr(Blocks, c)
         if isinstance(c, int):
             c = '[U+{}]'.format(hex(c)[2:])
         return c
@@ -1493,15 +1509,20 @@ class Being(BeingItemMixin):
 
     def handle_directional_turn(self, dir, loc):
         """Turn char based on which way it's facing."""
-        if hasattr(Blocks, name+'_r'):
+        print("self.char", self.char)
+        if hasattr(Blocks, self.char) and self.char[-2:] in ('_r','_l','_f', '_b'):
+            print('in handle_directional_turn()')
             to_r = False
             if loc:
                 to_r = loc.x>self.loc.x
+            print("to_r", to_r)
+            print("dir", dir)
             to_l = not to_r
-            if dir and dir =='l' or to_l:
-                self.char = getattr(Blocks, name+'_l')
+            if dir and dir =='l' or to_r:
+                self.char = self.char[:-2]+'_r'
             else:
-                self.char = getattr(Blocks, name+'_r')
+                self.char = self.char[:-2]+'_l'
+            print("self.char", self.char)
 
     def _move(self, dir, fly=False):
         m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0))[dir]
@@ -1580,6 +1601,7 @@ class Being(BeingItemMixin):
                 triggered_events.append(ShopKeeperEvent1)
 
             B.remove(self)
+            self.handle_directional_turn(dir, new)
             if not fly:
                 new = self.fall(new)
             if new[0] == LOAD_BOARD or new[0] is None:
@@ -1592,7 +1614,6 @@ class Being(BeingItemMixin):
             # this needs to be after previous block because the block looks at `top_obj` which would always be the being
             # instead of an event trigger item
             self.put(new)
-            self.handle_directional_turn(dir, new)
 
             if chk_oob(new.mod_d()) and B.found_type_at(Type.pressure_sensor, new.mod_d()):
                 if B.state==1:
@@ -1691,7 +1712,10 @@ class Being(BeingItemMixin):
     def fall(self, new):
         fly = False
         B=self.B
-        if not B.found_type_at(Type.ladder, new):
+        if B.found_type_at(Type.ladder, new):
+            if self.is_player:
+                self.char = 'player_b'
+        else:
             new2 = new
             while 1:
                 # TODO: these may overdraw non-blocking items; it's an ugly hack but creates a nice fall animation
@@ -2029,8 +2053,8 @@ class Being(BeingItemMixin):
                 B.put(obj.museum_door)
             obj.museum_door.type=Type.door3
 
-            for n in (6,7,8):
-                B.remove(B[B.specials[n]])
+            for b in self.B.museum_patrons:
+                B.remove(b)
             self.talk(self, 'The alarm sounds. you hear the noise of the grand oak door being shut and locked.')
             B.state = 1
 
@@ -2610,9 +2634,9 @@ class GroboClonesTakingZoeEvent(Event):
         B=self.B
         specials=B.specials
         pl = self.player
-        a=Being(B, specials[4], name='GroboClone', char=Blocks.elephant_l)
+        a=Being(B, specials[4], name='GroboClone', char='elephant')
         b=Being(B, specials[5], name='Zoe', char=Blocks.zoe)
-        c=Being(B, specials[6], name='GroboClone', char=Blocks.elephant_l)
+        c=Being(B, specials[6], name='GroboClone', char='elephant')
         pl.talk(pl, ID.zoe_taken)
         self.animate((a,b,c), 'h', sleep_time=0.3)
         B.remove(b)
@@ -2684,7 +2708,7 @@ class AlarmEvent1(Event):
 class GarbageTruckEvent(Event):
     once=True
     def go(self):
-        t = Item(self.B, Blocks.truck_l, 'Garbage truck', Loc(78, GROUND))
+        t = Item(self.B, 'truck', 'Garbage truck', Loc(78, GROUND))
         player = self.player
         self.animate(t, 'h', n=26)
         self.B.remove(player)
@@ -2711,6 +2735,7 @@ class DieEvent(Event):
     """Die or get arrested and sent back to jail."""
     once=False
     def go(self):
+        print ("in DieEvent go()")
         return Saves().load('start')
 
 class MagicBallEvent(Event):
@@ -2780,34 +2805,34 @@ class Timer:
         self.turns, self.evt = turns, evt
 
 class Player(Being):
-    char = Blocks.player_f
+    char = 'player'
     health = 10
     is_player = 1
     stance = Stance.sneaky
     name = 'Player'
 
 class Guard(Being):
-    char = 'g'
+    char = '\u001d'
     health = 3
 
 class Soldier(Being):
     health = 10
-    char = NewBlocks.soldier_l
+    char = 'soldier'
 
 class Technician(Being):
-    char = 't'
+    char = '\u001e'
 
 class RoboBunny(Being):
-    char = NewBlocks.rabbit_l
+    char = 'rabbit'
 
 class Clone(Being):
-    char = NewBlocks.elephant_l
+    char = 'elephant'
 
 class ShopKeeper(Being):
     char = NewBlocks.monkey
 
 class Grobo(Being):
-    char = NewBlocks.elephant_l
+    char = 'elephant'
 
 
 class Win1:
@@ -2843,14 +2868,14 @@ class Saves:
     def load(self, name=None):
         for n in range(1,999):
             fn = f'saves/{n}.data'
-            if not os.path.exists(fn + '.db'):
+            if not os.path.exists(fn+'.db'):
                 n-=1
                 fn = f'saves/{n}.data'
                 break
 
         if name:
             fn = f'saves/{name}.data'
-        if not os.path.exists(fn):
+        if not os.path.exists(fn+'.db'):
             return
 
         sh = shelve.open(fn, protocol=1)
@@ -3040,7 +3065,7 @@ def main(load_game):
         player.inv[ID.architect_pass] = 1
 
         player.inv[ID.book_of_bu] = 1
-        Item(None, Blocks.ferry_l, 'sailboat', id=ID.sailboat)
+        Item(None, 'ferry', 'sailboat', id=ID.sailboat)
         objects[ID.sailboat].state=1
 
     last_row = MAIN_Y+8
@@ -3118,7 +3143,7 @@ def main(load_game):
     player.add1(ID.key1)
 
     # only to keep state to unlock Port Beluga
-    m = Being(None, None, name='Maurice', char=Blocks.rabbit_l, id=ID.maurice, put=0)
+    m = Being(None, None, name='Maurice', char='rabbit', id=ID.maurice, put=0)
     m.state=1
 
     Saves().save(B.loc, 'start')
@@ -3542,7 +3567,7 @@ def editor(_map):
 
         # NPCs
         elif k == 'G':
-            B.put(Blocks.elephant, loc)
+            B.put(Blocks.elephant_l, loc)
         elif k == 'O':
             B.put(Blocks.soldier_l, loc)
 
