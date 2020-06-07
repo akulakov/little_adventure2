@@ -21,7 +21,7 @@ import shelve
 
 oprint = print
 
-__version__ = (0,4,2)
+__version__ = (0,4,3)
 
 rock = '█'
 blank = ' '
