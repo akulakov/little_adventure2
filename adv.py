@@ -606,7 +606,7 @@ class Board:
         self.guards = [g]
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill1)
         p = Player(self, specials[3], id=ID.player)
-        Item(self, rock, '', specials[4], id=ID.stone3, type=Type.blocking, color=gray_col())
+        BlockingItem(self, rock, '', specials[4], id=ID.stone3, color=gray_col())
         return p
 
     def board_und2(self):
@@ -652,8 +652,6 @@ class Board:
         containers[0].add1(ID.key1)
         self.remove(crates[5])
         Item(self, Blocks.crate1, 'crate', crates[5].loc, id=ID.crate1)
-        # c = self[crates[5].loc]
-        # c = objects[ID.crate1]
 
         TriggerEventLocation(self, specials[1], evt=MaxState1)
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill4)
@@ -664,7 +662,6 @@ class Board:
         self.labels.append((10,5, "The Ferry"))
         containers, crates, doors, specials = self.load_map(self._map)
         julien, clone1 = specials[Blocks.elephant_l]
-        # key3 = Item(self, Blocks.key, 'key', id=ID.key3, put=0)
         clone1.inv[ID.key3] = 1
         julien.id = ID.julien
         objects[julien.id] = julien
@@ -672,14 +669,12 @@ class Board:
         Item(self, Blocks.grill, 'grill', specials[1], id=ID.grill4)
         Item(self, Blocks.ticket_seller, 'Ticket seller booth', specials[2], id=ID.ticket_seller1)
         Item(self, 'ferry', 'Ferry', specials[8], id=ID.ferry)
-        # invisible, with ferry id to be able to take the ferry near this tile
-        # Item(self, '', '', specials[3], id=ID.ferry)
 
     def board_8(self):
         containers, crates, doors, specials = self.load_map(self._map)
         Item(self, Blocks.grill, 'grill', specials[1], id=ID.grill5)
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill6)
-        Item(self, Blocks.bars, 'jail bars', specials[5], id=ID.bars1, type=Type.blocking)
+        BlockingItem(self, Blocks.bars, 'jail bars', specials[5], id=ID.bars1)
         Item(self, '', '', specials[8], id=ID.trick_guard)
         TriggerEventLocation(self, specials[7], evt=JailEvent)
         s = Soldier(self, specials[3], id=ID.soldier2)
@@ -781,7 +776,7 @@ class Board:
         Item(self, Blocks.lever, 'lever', specials[1], id=ID.lever1)
         Item(self, Blocks.lever, 'lever', specials[2], id=ID.lever2)
         Item(self, Blocks.statue, 'statue', specials[3], id=ID.statue)
-        Item(self, Blocks.platform_top, 'platform', specials[4], id=ID.platform3, type=Type.blocking)
+        BlockingItem(self, Blocks.platform_top, 'platform', specials[4], id=ID.platform3)
 
     def board_des_und2(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -789,10 +784,10 @@ class Board:
         Item(self, Blocks.lever, 'lever', specials[2], id=ID.lever4)
         Item(self, Blocks.lever, 'lever', specials[3], id=ID.lever5)
 
-        Item(self, Blocks.platform_top, 'platform', specials[4], id=ID.platform4, type=Type.blocking)
-        Item(self, Blocks.platform_top, 'platform', specials[5], id=ID.platform5, type=Type.blocking)
-        Item(self, Blocks.platform_top, 'platform', specials[6], id=ID.platform6, type=Type.blocking)
-        Item(self, Blocks.books[0], 'Book of Bu', specials[7], id=ID.book_of_bu)
+        BlockingItem(self, Blocks.platform_top, 'platform', specials[4], id=ID.platform4)
+        BlockingItem(self, Blocks.platform_top, 'platform', specials[5], id=ID.platform5)
+        BlockingItem(self, Blocks.platform_top, 'platform', specials[6], id=ID.platform6)
+        BlockingItem(self, Blocks.books[0], 'Book of Bu', specials[7], id=ID.book_of_bu)
         TriggerEventLocation(self, specials[8], evt=LeaveBuEvent)
 
     # -----------------------------------------------------------------------------------------------
@@ -858,7 +853,7 @@ class Board:
         s=Soldier(self, specials[1], id=ID.soldier3)
         self.soldiers.append(s)
         RoboBunny(self, specials[2], id=ID.painter, name='Jaca')
-        Item(self, rock, '', specials[3], id=ID.stone2, type=Type.blocking)
+        BlockingItem(self, rock, '', specials[3], id=ID.stone2)
         for n in range(4,7):
             Item(self, Blocks.pod, 'Teleportation Pod', specials[n], type=Type.pod)
         Item(self, Blocks.computer, 'Computer', specials[7], id=ID.computer)
@@ -905,7 +900,7 @@ class Board:
     def board_bar(self):
         containers, crates, doors, specials = self.load_map(self._map)
         Being(self, specials[1], name='Sever', char='elephant', id=ID.sever)
-        Item(self, rock, '', specials[2], id=ID.stone1, type=Type.blocking)
+        BlockingItem(self, rock, '', specials[2], id=ID.stone1)
 
     def board_dynofly(self):
         containers, crates, doors, specials = self.load_map(self._map)
@@ -947,7 +942,7 @@ class Board:
                 loc = Loc(x,y)
                 if char != blank:
                     if char==rock:
-                        Item(self, Blocks.rock, '', loc, type=Type.blocking, color=gray_col())
+                        BlockingItem(self, Blocks.rock, '', loc, color=gray_col())
 
                     if char=='W':
                         Item(self, Blocks.window, '', loc, color='blue')   # window
@@ -983,7 +978,7 @@ class Board:
                         Item(self, Blocks.snowflake, 'snowflake', loc)
 
                     elif char==Blocks.rock3:
-                        Item(self, Blocks.rock3, 'rock', loc, type=Type.blocking)
+                        BlockingItem(self, Blocks.rock3, 'rock', loc)
 
                     elif char==Blocks.block1:
                         Item(self, Blocks.block1, 'block', loc, type=Type.door_top_block)
@@ -1011,7 +1006,7 @@ class Board:
                         Item(self, Blocks.fountain, 'water fountain basin', loc)
 
                     elif char==Blocks.dock_boards:
-                        Item(self, Blocks.dock_boards, 'dock boards', loc, type=Type.blocking)
+                        BlockingItem(self, Blocks.dock_boards, 'dock boards', loc)
 
                     elif char==Blocks.grill:
                         Item(self, Blocks.grill, 'barred window', loc)
@@ -1033,13 +1028,13 @@ class Board:
                         Item(self, 'ferry', 'ferry', loc, id=ID.ferry)
 
                     elif char==Blocks.bars:
-                        Item(self, Blocks.bars, 'jail bars', loc, type=Type.blocking)
+                        BlockingItem(self, Blocks.bars, 'jail bars', loc)
 
                     elif char=='/':
-                        Item(self, Blocks.angled1, '', loc, type=Type.blocking)
+                        BlockingItem(self, Blocks.angled1, '', loc)
 
                     elif char=='\\':
-                        Item(self, Blocks.angled2, '', loc, type=Type.blocking)
+                        BlockingItem(self, Blocks.angled2, '', loc)
 
                     # -----------------------------------------------------------------------------------------------
                     elif char == OldBlocks.tree1:
@@ -1066,13 +1061,13 @@ class Board:
                     #         self.put(Blocks.platform_top, loc)
 
                     elif char==OldBlocks.steps_l:
-                        Item(self, Blocks.steps_l, '', loc, type=Type.blocking, color=gray_col())
+                        BlockingItem(self, Blocks.steps_l, '', loc, color=gray_col())
 
                     elif char==OldBlocks.steps_r:
-                        Item(self, Blocks.steps_r, '', loc, type=Type.blocking, color=gray_col())
+                        BlockingItem(self, Blocks.steps_r, '', loc, color=gray_col())
 
                     elif char==OldBlocks.platform2:
-                        Item(self, Blocks.platform2, '', loc, type=Type.blocking)
+                        BlockingItem(self, Blocks.platform2, '', loc)
 
                     elif char==OldBlocks.elephant:
                         g = Grobo(self, loc)
@@ -1304,6 +1299,7 @@ class Item(BeingItemMixin):
 
     def __init__(self, B, char, name, loc=None, put=True, id=None, type=None, color=None):
         self.char, self.name, self.loc, self.id, self.type, self.color = char, name, loc, id, type, color
+
         if B:
             self.board_map = B._map
 
@@ -1323,6 +1319,11 @@ class Item(BeingItemMixin):
             self.B.remove(self)
             self.loc = new
             self.B.put(self)
+
+class BlockingItem(Item):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.type = Type.blocking
 
 class TriggerEventLocation(Item):
     """Location that triggers an event."""
@@ -1811,7 +1812,6 @@ class Being(BeingItemMixin):
                 self.remove1(ID.hair_dryer)
                 self.kashes+=10
                 obj.baldino.state = 3
-                # pp = Item(None, Blocks.proto_pack, 'Proto-pack', id=ID.proto_pack)
                 self.inv[ID.proto_pack] = 1
                 status('Baldino gives you the Proto-pack')
 
@@ -1886,7 +1886,6 @@ class Being(BeingItemMixin):
         elif is_near('candanchu'):
             self.talk(obj.candanchu)
             status('Candanchu gives you a fancy-looking key..')
-            # self.inv[Item(None, Blocks.key, 'fancy key', id=ID.safe_key)] = 1
             self.inv[ID.safe_key] = 1
 
         elif is_near('robobunny1'):
@@ -1894,14 +1893,12 @@ class Being(BeingItemMixin):
 
         elif is_near('safe') and self.has(ID.safe_key):
             status("You discover Dr.FunFrock's saber!!")
-            # self.inv[Item(None, Blocks.saber, "Saber", id=ID.saber)] = 1
             self.inv[ID.saber] = 1
             self.talk(self,ID.safe_note)
             obj.graus.state = 1
 
         elif is_near('graus') and obj.graus.state==1:
             self.talk(obj.graus)
-            # self.inv[Item(None, Blocks.card, "Architect's pass", id=ID.architect_pass)] = 1
             self.inv[ID.architect_pass] = 1
 
         elif is_near('sever'):
@@ -1934,7 +1931,6 @@ class Being(BeingItemMixin):
             resp = self.talk(self, ['To free the Marked stone, speak the word ODOS', 'Which word will free me?'], resp=True)
             if resp.lower()=='dax':
                 status('You see the mighty stone disappear and a magic flute floats into your hand!')
-                # self.inv[Item(None, Blocks.flute, 'Magic Flute', id=ID.magic_flute)] = 1
                 self.inv[ID.magic_flute] = 1
 
         elif is_near('alarm_tech'):
@@ -1983,7 +1979,6 @@ class Being(BeingItemMixin):
 
         elif is_near('elf'):
             self.talk(obj.elf)
-            # self.inv[Item(None, 'B', 'blue card', id=ID.blue_card)] = 1
             self.inv[ID.blue_card] = 1
             status('The elf gives you the blue magnetic card!')
 
@@ -2021,7 +2016,7 @@ class Being(BeingItemMixin):
             self.talk(obj.fenioux)
             if obj.fenioux.state==1:
                 self.talk(obj.fenioux, ID.fenioux2)
-                rc = Item(None, 'R', 'red magnetic card', id=ID.red_card)
+                Item(None, 'R', 'red magnetic card', id=ID.red_card)
                 self.inv[ID.red_card] = 1
 
         elif is_near('salesman') and obj.salesman.state==1:
@@ -2029,7 +2024,6 @@ class Being(BeingItemMixin):
             if y:
                 if self.kashes>=20:
                     self.kashes-=20
-                    # hd = Item(None, Blocks.hair_dryer, 'Hair dryer', id=ID.hair_dryer)
                     self.inv[ID.hair_dryer] = 1
                 else:
                     status('You do not have enough kashes!')
@@ -2291,7 +2285,6 @@ class Being(BeingItemMixin):
         elif is_near('water_supply') and item_id == ID.jar_syrup:
             status('You add raspberry syrup to the water supply')
             self.inv[item_id] -=1
-            # empty_bottle = Item(None, Blocks.bottle, 'empty bottle', id=ID.empty_bottle)
             self.inv[ID.empty_bottle] += 1
             # a little hacky, would be better to add a water supply obj and update its state
             obj.clermont_ferrand.state = 2
@@ -3083,17 +3076,16 @@ def main(load_game):
 
     Item(None, 'H', 'hair dryer', id=ID.hair_dryer)
     Item(None, 'P', 'proto pack', id=ID.proto_pack)
-    Item(None,'g','gk',id=ID.golden_key)
+    Item(None, Blocks.key,'gk',id=ID.golden_key)
     Item(None, Blocks.key,'special key', id=ID.key3)
-    Item(None,'h',"Gawley's horn",id=ID.gawley_horn)
+    Item(None, Blocks.horn,"Gawley's horn",id=ID.gawley_horn)
     Item(None, Blocks.bottle,'empty bottle', id=ID.empty_bottle)
-    Item(None, 'f','magic flute', id=ID.magic_flute)
+    Item(None, Blocks.flute,'magic flute', id=ID.magic_flute)
     Item(None, Blocks.magic_ball,'magic ball', id=ID.magic_ball)
     Item(None, 'c','blue card', id=ID.blue_card)
     Item(None, 'p','architect_pass', id=ID.architect_pass)
     Item(None, Blocks.bottle, 'jar of raspberry syrup', id=ID.jar_syrup)
     Item(None, Blocks.wine, 'half bottle of wine', id=ID.wine)
-    # Item(None, Blocks.crate1, 'crate', id=ID.crate1)
     Item(None, Blocks.bottle, 'Bottle of clear water', id=ID.bottle_clear_water)
 
     f = obj_by_attr.ferry
@@ -3112,7 +3104,7 @@ def main(load_game):
         if not rv: break
         if rv==1: continue
         B, player = rv
-    blt.set("U+E100: none; U+E200: none; U+E300: none; zodiac font: none")
+    blt.set('U+E100: none; U+E200: none; U+E300: none; zodiac font: none')
     blt.composition(False)
     blt.close()
 
@@ -3120,7 +3112,7 @@ keymap = dict(
     [
     [ blt.TK_SHIFT, 'SHIFT' ],
     [ blt.TK_RETURN, '\n' ],
-    [ blt.TK_PERIOD, "." ],
+    [ blt.TK_PERIOD, '.' ],
 
     [ blt.TK_Q, 'q' ],
     [ blt.TK_W, 'w' ],
@@ -3164,13 +3156,24 @@ keymap = dict(
     [ blt.TK_SPACE, ' ' ],
     [ blt.TK_MINUS, '-' ],
     [ blt.TK_SLASH, '/' ],
+
+    [ blt.TK_UP, 'UP' ],
+    [ blt.TK_LEFT, 'LEFT' ],
+    [ blt.TK_DOWN, 'DOWN' ],
+    [ blt.TK_RIGHT, 'RIGHT' ],
+
     ]
 )
 
 def parsekey(k):
     if k==blt.TK_SHIFT:
         return k
-    if k and blt.check(blt.TK_WCHAR) or k==blt.TK_RETURN:
+    keys = [ blt.TK_UP,
+             blt.TK_LEFT,
+             blt.TK_DOWN,
+             blt.TK_RIGHT,
+             blt.TK_RETURN, ]
+    if k and blt.check(blt.TK_WCHAR) or k in keys:
         k = keymap.get(k)
         if k and blt.state(blt.TK_SHIFT):
             k = k.upper()
@@ -3235,7 +3238,7 @@ def handle_ui(B, player):
                   (Q)uit game
                   """.split('\n'))
 
-    elif k in 'hjklHL':
+    elif k in 'hjklHL' or k in 'UP DOWN LEFT RIGHT'.split():
         Misc.last_dir = k
         if k in 'HL':
             k = k.lower()
@@ -3244,6 +3247,7 @@ def handle_ui(B, player):
                 if rv[0] == LOAD_BOARD:
                     break
         else:
+            k = dict(UP='k',DOWN='j',LEFT='h',RIGHT='l').get(k) or k
             rv = player.move(k)
 
         if rv[0] == LOAD_BOARD:
