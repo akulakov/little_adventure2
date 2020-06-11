@@ -7,7 +7,7 @@ The game is inspired by the world and story of an old game called Little Big Adv
 Requirements
 ---
 
-- Python3  (On Mac OS run `brew install python3`, other platforms see http://www.python.org/downloads/)
+- Python3.6+  (On Mac OS run `brew install python3`, other platforms see http://www.python.org/downloads/)
 
 - bearlibterminal
     `pip3 install bearlibterminal`
