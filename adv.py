@@ -73,7 +73,8 @@ class Blocks:
     ladder = '\u26c3'
     platform2 = '\u23af'
     platform_top = '\u23ba'
-    rock2 = '\u2337'
+    # rock2 = '\u2337'
+    rock2 = '\u16c9'    # supports under houses
 
     platform = '▁'
     bell = '\u26c4'
@@ -99,6 +100,7 @@ class Blocks:
     cupboard = '\u269a'
     sunflower = '\u269c'
     magic_ball = '\u25cd'
+    cursor = '\u25cd'       # for the editor
     crate1 = '\u25e7'
     crate2 = '\u25e8'
     crate3 = '\u25e9'
@@ -196,12 +198,6 @@ for k,v in OldBlocks.__dict__.items():
     if nv:
         old_blocks_to_new[v] = nv
         new_blocks_to_old[nv] = v
-
-# print("OldBlocks.__dict__", OldBlocks.__dict__)
-# print("old_blocks_to_new", old_blocks_to_new)
-# print()
-# print("new_blocks_to_old", new_blocks_to_old)
-
 
 class Stance:
     normal = 1
@@ -569,6 +565,7 @@ class Loc:
 def map_to_board(_map):
     l = map_to_loc[_map]
     return boards[l.y][l.x]
+
 
 class Board:
     def __init__(self, loc, _map):
@@ -2789,7 +2786,9 @@ class Grobo(Being):
 
 class Win1:
     @staticmethod
-    def addstr(y,x, text):
+    def addstr(y, x, text, color=None):
+        if color:
+            text = f'[color={color}]{text}[/color]'
         if isinstance(text, str):
             blt.puts(x, y, text)
         else:
@@ -3478,15 +3477,16 @@ def editor(_map):
             m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0), y=(-1,-1), u=(-1,1), b=(1,-1), n=(1,1), H=(0,-1), L=(0,1))[k]
 
             for _ in range(n):
-                if brush:
-                    B.B[loc.y][loc.x] = [brush]
                 if chk_oob(loc.mod(*m)):
                     loc = loc.mod(*m)
+                if brush:
+                    B.B[loc.y][loc.x] = [brush]
 
         elif k == ' ':
             brush = None
         elif k == 'e':
             brush = ' '
+            B.B[loc.y][loc.x] = [brush]
         elif k == 'r':
             brush = rock
         elif k == 's':
@@ -3614,8 +3614,8 @@ def editor(_map):
             written=1
 
         B.draw()
-        blt.clear_area(loc.x,loc.y,1,1)
-        Windows.win.addstr(loc.y, loc.x, Blocks.circle3)
+        # blt.clear_area(loc.x,loc.y,1,1)
+        Windows.win.addstr(loc.y, loc.x, Blocks.cursor, 'blue')
         Windows.refresh()
         if brush==blank:
             tool = 'eraser'
