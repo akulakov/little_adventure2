@@ -100,6 +100,7 @@ class Blocks:
     cupboard = '\u269a'
     sunflower = '\u269c'
     magic_ball = '\u25cd'
+    cursor = '\u25cd'       # for the editor
     crate1 = '\u25e7'
     crate2 = '\u25e8'
     crate3 = '\u25e9'
@@ -200,12 +201,6 @@ for k,v in OldBlocks.__dict__.items():
     if nv:
         old_blocks_to_new[v] = nv
         new_blocks_to_old[nv] = v
-
-# print("OldBlocks.__dict__", OldBlocks.__dict__)
-# print("old_blocks_to_new", old_blocks_to_new)
-# print()
-# print("new_blocks_to_old", new_blocks_to_old)
-
 
 class Stance:
     normal = 1
@@ -576,6 +571,7 @@ def map_to_board(_map):
     print("map_to_loc", map_to_loc)
     l = map_to_loc[_map]
     return boards[l.y][l.x]
+
 
 class Board:
     def __init__(self, loc, _map):
@@ -2807,7 +2803,9 @@ class Grobo(Being):
 
 class Win1:
     @staticmethod
-    def addstr(y,x, text):
+    def addstr(y, x, text, color=None):
+        if color:
+            text = f'[color={color}]{text}[/color]'
         if isinstance(text, str):
             blt.puts(x, y, text)
         else:
@@ -3494,6 +3492,7 @@ def editor(_map):
             brush = None
         elif k == 'e':
             brush = ' '
+            B.B[loc.y][loc.x] = [brush]
         elif k == 'r':
             brush = rock
         elif k == 's':
@@ -3625,7 +3624,9 @@ def editor(_map):
 
         B.draw()
         blt.clear_area(loc.x,loc.y,1,1)
-        Windows.win.addstr(loc.y, loc.x, Blocks.circle3)
+        # Windows.win.addstr(loc.y, loc.x, Blocks.circle3)
+        Windows.win.addstr(loc.y, loc.x, Blocks.cursor, 'blue')
+        Windows.refresh()
         if brush==blank:
             tool = 'eraser'
         elif brush==rock:
