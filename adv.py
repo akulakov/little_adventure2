@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 bugs
     - fix bying of wine
@@ -73,11 +73,12 @@ class Blocks:
     ladder = '\u26c3'
     platform2 = '\u23af'
     platform_top = '\u23ba'
-    rock2 = '\u2337'
+    # rock2 = '\u2337'
+    rock2 = '\u16c9'    # supports under houses
 
     platform = '▁'
     bell = '\u26c4'
-    grill = '\u2591'
+    grill = '\u25a4'
     rubbish = '\u26c1'
     truck_l = '\u26c5'
     truck_r = '\u26c6'
@@ -145,8 +146,8 @@ class Blocks:
 
     #---------------
     rock3 = '\u2593'
-    angled1 = '\u26da'
-    angled2 = '\u26db'
+    angled1 = '\u26e0'
+    angled2 = '\u26e1'
     picture = '\u26b4'
     bottle = '\u26b9'
     box1 = '\u25a4'
@@ -184,6 +185,9 @@ class Blocks:
     player_b = '\u26d8'
 
     window = '\u2503'
+
+    cornice_l = '\u26e3'
+    cornice_r = '\u26e4'
 
     crates = (crate1, crate2, crate3, crate4)
 
@@ -419,6 +423,8 @@ conversations = {
     ID.soldier2: ['Wait! How did you get here, and who are you?',
                   ["I'm Twinsen, I'm escaping!", "Fixing the antenna.", "Santa Claus."]],
 
+    ID.guard1: ["Did you know, - if you are sneaky, you can get through some hidden passages that are too narrow and twisty otherwise! Oh, and I wouldn't go straight ahead, the soldier watching the path is a rusty old nail."],
+
     ID.guard2: ['Hey! I think the stone is loose in my cell! I might escape..', "Hmm, that's odd, I remember checking the camera earlier.. I guess there's no harm in checking again!"],
 
     ID.chamonix: ['Have you seen a young girl being led by two Groboclones?', "I haven't seen them.. ", "Here's something strange: I found a page torn out of a book which said, 'pull the middle lever once first then pull the right lever once.' Must be some kind of puzzle.", "I'm really enjoying a book about all kinds of wonders, one of them being a Clear Water Lake in the Himalayi mountains!"],
@@ -567,6 +573,7 @@ class Loc:
         return self.mod(-1, 0)
 
 def map_to_board(_map):
+    print("map_to_loc", map_to_loc)
     l = map_to_loc[_map]
     return boards[l.y][l.x]
 
@@ -644,6 +651,9 @@ class Board:
         Grobo(self, specials[1], id=ID.max_, name='Max')
         RoboBunny(self, specials[2], id=ID.anthony, name='Anthony')
         RoboBunny(self, specials[3], id=ID.graus, name='Mr. Graus')
+
+    def board_ins1(self):
+        self.load_map(self._map)
 
     def board_6(self):
         self.labels.append((2,20, "Twinsen's Home"))
@@ -943,6 +953,9 @@ class Board:
                 if char != blank:
                     if char==rock:
                         BlockingItem(self, Blocks.rock, '', loc, color=gray_col())
+
+                    elif char in (Blocks.cornice_l, Blocks.cornice_r):
+                        BlockingItem(self, char, 'cornice', loc, color=gray_col())
 
                     if char=='W':
                         Item(self, Blocks.window, '', loc, color='blue')   # window
@@ -1274,6 +1287,8 @@ class BeingItemMixin:
         self.inv[id] += n
 
     def move_to_board(self, _map, specials_ind=None, loc=None):
+        print("_map", _map)
+        print("map_to_board", map_to_board)
         to_B = map_to_board(_map)
         if specials_ind is not None:
             loc = to_B.specials[specials_ind]
@@ -1850,6 +1865,9 @@ class Being(BeingItemMixin):
 
         elif is_near('anthony'):
             BuyADrinkAnthony(B).go()
+
+        elif is_near('guard1'):
+            self.talk(objects[ID.guard1])
 
         elif is_near('trick_guard'):
             self.talk(objects[ID.guard2])
@@ -2654,7 +2672,7 @@ class AlarmEvent1(Event):
     once=True
     def go(self):
         self.animate(obj_by_attr.technician1, 'l', n=4)
-        self.player.talk(self.player, ['!ALARM!', 'A few GroboClones attack you and take you back to Jail.'])
+        self.player.talk(self.player, ['!ALARM!', 'A few GroboClones attack you and take you to Jail.'])
         return Saves().load('start')
 
 class GarbageTruckEvent(Event):
@@ -2875,13 +2893,6 @@ def main(load_game):
     blt.color("white")
     blt.composition(True)
 
-    # blt.set("U+E200: Tiles.png, size=24x24, align=top-left")
-    # blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
-    # blt.set("U+E300: fontello.ttf, size=16x16, spacing=3x2, codepage=cp.txt")
-    # gl_size = SIZE+8
-    # blt.set(f"U+E300: NotoEmoji-Regular.ttf, size={gl_size}x{gl_size}, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
-    # blt.set(f"U+E400: FreeMono2.ttf, size={gl_size}x{gl_size}, spacing=3x2, codepage=monocp.txt, align=top-left")          # GNU
-
     blt.clear()
     blt.color("white")
 
@@ -2914,10 +2925,11 @@ def main(load_game):
     b3 = Board(Loc(2,MAIN_Y), 3)
     b4 = Board(Loc(3,MAIN_Y), 4)
     b5 = Board(Loc(4,MAIN_Y), 5)
-    b6 = Board(Loc(5,MAIN_Y), 6)
-    b7 = Board(Loc(6,MAIN_Y), 7)
-    b8 = Board(Loc(7,MAIN_Y), 8)
-    b9 = Board(Loc(8,MAIN_Y), 9)
+    ins1 = Board(Loc(5,MAIN_Y), 'ins1')
+    b6 = Board(Loc(6,MAIN_Y), 6)
+    b7 = Board(Loc(7,MAIN_Y), 7)
+    b8 = Board(Loc(8,MAIN_Y), 8)
+    b9 = Board(Loc(9,MAIN_Y), 9)
 
     player = b1.board_1()
     if DBG:
@@ -2927,6 +2939,7 @@ def main(load_game):
     b3.board_3()
     b4.board_4()
     b5.board_5()
+    ins1.board_ins1()
     b6.board_6()
     b7.board_7()
     b8.board_8()
@@ -3044,8 +3057,8 @@ def main(load_game):
 
          [des_und2,des_und,None,None, None,None,None,None, None,None, None, None],
 
-         [None,None,None,None, None,None,None,top3, top2,top1, None, None],
-         [b1, b2,   b3, b4,    b5, b6,   b7, b8,    b9, b10, b11, b12],
+         [None,None,None,None, None,None,None, None,top3, top2,top1, None, None],
+         [b1, b2,   b3, b4,    b5, ins1, b6,   b7, b8,    b9, b10, b11, b12],
          [und2,None,None,None, None,None,None,None, None,None, None, b13],
 
          [proxima1,proxima2,    museum,   proxima4, mstone,None,None,None, None,None, None, None],
@@ -3443,12 +3456,6 @@ def editor(_map):
     blt.color("white")
     blt.composition(True)
 
-    # blt.set("U+E200: Tiles.png, size=24x24, align=top-left")
-    # blt.set("U+E300: fontawesome-webfont.ttf, size=16x16, spacing=3x2, codepage=fontawesome-codepage.txt")
-    # blt.set("U+E300: fontello.ttf, size=16x16, spacing=3x2, codepage=cp.txt")
-    # blt.set("U+E300: NotoEmoji-Regular.ttf, size=32x32, spacing=3x2, codepage=notocp.txt, align=top-left")  # GOOGLE
-    # blt.set("U+E400: FreeMono2.ttf, size=32x32, spacing=3x2, codepage=monocp.txt, align=top-left")           # GNU
-
     blt.clear()
     blt.color("white")
     Misc.is_game = 0
@@ -3478,10 +3485,10 @@ def editor(_map):
             m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0), y=(-1,-1), u=(-1,1), b=(1,-1), n=(1,1), H=(0,-1), L=(0,1))[k]
 
             for _ in range(n):
-                if brush:
-                    B.B[loc.y][loc.x] = [brush]
                 if chk_oob(loc.mod(*m)):
                     loc = loc.mod(*m)
+                if brush:
+                    B.B[loc.y][loc.x] = [brush]
 
         elif k == ' ':
             brush = None
@@ -3554,7 +3561,7 @@ def editor(_map):
             B.put(choice(Blocks.flowers), loc)
 
         elif k == 'o':
-            cmds = 'gm gl gr l b ob f C'.split()
+            cmds = 'gm gl gr l b ob f C cl cr'.split()
             cmd = ''
             BL=Blocks
             while 1:
@@ -3564,6 +3571,9 @@ def editor(_map):
                 if   cmd == 'gm': B.put(BL.guardrail_m, loc)
                 elif cmd == 'gl': B.put(BL.guardrail_l, loc)
                 elif cmd == 'gr': B.put(BL.guardrail_r, loc)
+
+                elif cmd == 'cl': B.put(BL.cornice_l, loc)
+                elif cmd == 'cr': B.put(BL.cornice_r, loc)
 
                 elif cmd == 'l':  B.put(BL.locker, loc)
                 elif cmd == 'b':  B.put(BL.books[0], loc)
@@ -3616,7 +3626,6 @@ def editor(_map):
         B.draw()
         blt.clear_area(loc.x,loc.y,1,1)
         Windows.win.addstr(loc.y, loc.x, Blocks.circle3)
-        Windows.refresh()
         if brush==blank:
             tool = 'eraser'
         elif brush==rock:
@@ -3628,6 +3637,7 @@ def editor(_map):
         Windows.win.addstr(1,73, tool)
         Windows.win.addstr(0, 0 if loc.x>40 else 70,
                            str(loc))
+        Windows.refresh()
         if written:
             Windows.win.addstr(2,65, 'map written')
             written=0
