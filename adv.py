@@ -1268,7 +1268,7 @@ class BeingItemMixin:
         self.loc = loc
         B=self.B
         B.put(self)
-        if self.is_player and ID.platform1 in B.get_ids(loc) and loc==B.specials[3].mod_r():
+        if self.is_player and ID.platform1 in B.get_ids(loc) and loc==B.specials[5].mod_r():
             Event(B).animate_arc(obj_by_attr.platform1, B.specials[1], carry_item=self, height=3, sleep_time=0.01)
 
     def has(self, id):
@@ -2618,7 +2618,7 @@ class GuardAttackEvent1(Event):
         if guard.loc != B.specials[1]:
             return
         guard.hostile = 1
-        self.animate_arc(obj_by_attr.platform1, B.specials[3].mod_r(), carry_item=guard, height=3, sleep_time=0.01)
+        self.animate_arc(obj_by_attr.platform1, B.specials[5].mod_r(), carry_item=guard, height=3, sleep_time=0.01)
 
 # class PlatformEvent1(Event):
 #     once=False
@@ -2669,7 +2669,8 @@ class AlarmEvent1(Event):
     def go(self):
         self.animate(obj_by_attr.technician1, 'l', n=4)
         self.player.talk(self.player, ['!ALARM!', 'A few GroboClones attack you and take you to Jail.'])
-        return Saves().load('start')
+        return self.player.move_to_board('1', specials_ind=5)
+        # return Saves().load('start')
 
 class GarbageTruckEvent(Event):
     once=True
