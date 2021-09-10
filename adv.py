@@ -648,9 +648,6 @@ class Board:
         RoboBunny(self, specials[2], id=ID.anthony, name='Anthony')
         RoboBunny(self, specials[3], id=ID.graus, name='Mr. Graus')
 
-    def board_ins1(self):
-        self.load_map(self._map)
-
     def board_6(self):
         self.labels.append((2,20, "Twinsen's Home"))
         containers, crates, doors, specials = self.load_map(self._map)
@@ -2924,7 +2921,6 @@ def main(load_game):
     b3 = Board(Loc(2,MAIN_Y), 3)
     b4 = Board(Loc(3,MAIN_Y), 4)
     b5 = Board(Loc(4,MAIN_Y), 5)
-    ins1 = Board(Loc(5,MAIN_Y), 'ins1')
     b6 = Board(Loc(6,MAIN_Y), 6)
     b7 = Board(Loc(7,MAIN_Y), 7)
     b8 = Board(Loc(8,MAIN_Y), 8)
@@ -2938,7 +2934,6 @@ def main(load_game):
     b3.board_3()
     b4.board_4()
     b5.board_5()
-    ins1.board_ins1()
     b6.board_6()
     b7.board_7()
     b8.board_8()
@@ -3056,8 +3051,8 @@ def main(load_game):
 
          [des_und2,des_und,None,None, None,None,None,None, None,None, None, None],
 
-         [None,None,None,None, None,None,None, None,top3, top2,top1, None, None],
-         [b1, b2,   b3, b4,    b5, ins1, b6,   b7, b8,    b9, b10, b11, b12],
+         [None,None,None,None, None,None,None, top3, top2,top1, None, None],
+         [b1, b2,   b3, b4,    b5, b6,   b7, b8,    b9, b10, b11, b12],
          [und2,None,None,None, None,None,None,None, None,None, None, b13],
 
          [proxima1,proxima2,    museum,   proxima4, mstone,None,None,None, None,None, None, None],
