@@ -181,8 +181,14 @@ class Blocks:
     funfrock = '\u26d3'
 
     player_f = '\u26d5'
-    player_l = '\u26d6'
-    player_r = '\u26d7'
+    player_l1 = '\u26d6'
+    player_l2 = '\u270b'
+    player_l3 = '\u270c'
+    player_l4 = '\u270b'
+    player_r1 = '\u26d7'
+    player_r2 = '\u270d'
+    player_r3 = '\u270e'
+    player_r4 = '\u270d'
     player_b = '\u26d8'
 
     window = '\u2503'
@@ -418,8 +424,6 @@ conversations = {
     ID.soldier2: ['Wait! How did you get here, and who are you?',
                   ["I'm Twinsen, I'm escaping!", "Fixing the antenna.", "Santa Claus."]],
 
-    ID.guard1: ["Did you know, - if you are sneaky, you can get through some hidden passages that are too narrow and twisty otherwise! Oh, and I wouldn't go straight ahead, the soldier watching the path is a rusty old nail."],
-
     ID.guard2: ['Hey! I think the stone is loose in my cell! I might escape..', "Hmm, that's odd, I remember checking the camera earlier.. I guess there's no harm in checking again!"],
 
     ID.chamonix: ['Have you seen a young girl being led by two Groboclones?', "I haven't seen them.. ", "Here's something strange: I found a page torn out of a book which said, 'pull the middle lever once first then pull the right lever once.' Must be some kind of puzzle.", "I'm really enjoying a book about all kinds of wonders, one of them being a Clear Water Lake in the Himalayi mountains!"],
@@ -568,7 +572,7 @@ class Loc:
         return self.mod(-1, 0)
 
 def map_to_board(_map):
-    print("map_to_loc", map_to_loc)
+    #print("map_to_loc", map_to_loc)
     l = map_to_loc[_map]
     return boards[l.y][l.x]
 
@@ -1253,6 +1257,8 @@ class BeingItemMixin:
         if isinstance(c, str) and len(c)>1:
             if '_' not in c:
                 c += '_l'
+                if not hasattr(Blocks, c):
+                    c+='1'
                 self.char = c
             c = getattr(Blocks, c)
         if isinstance(c, int):
@@ -1480,18 +1486,28 @@ class Being(BeingItemMixin):
     def handle_directional_turn(self, dir, loc):
         """Turn char based on which way it's facing."""
         print("self.char", self.char)
-        if hasattr(Blocks, self.char) and self.char[-2:] in ('_r','_l','_f','_b'):
+        import re
+        m = re.match(r'(.+)_([rlfb])([1234])?', self.char)
+        if m:
+            base, ornt, n = m.groups()
+            if n:
+                n = int(n)+1 if int(n)<4 else 1
+
+        if hasattr(Blocks, self.char) and m:
             print('in handle_directional_turn()')
             to_r = to_l = False
             if loc:
                 to_r = loc.x>self.loc.x
                 to_l = loc.x<self.loc.x
-            print("to_r", to_r)
-            print("dir", dir)
+            if (to_r and ornt!='r') or (to_l and ornt!='l'):
+                n = 1
+            print(dir, to_r, to_l, n)
             if dir and dir =='l' or to_r:
-                self.char = self.char[:-2]+'_r'
+                self.char = base+'_r'
             elif dir and dir =='h' or to_l:
-                self.char = self.char[:-2]+'_l'
+                self.char = base+'_l'
+            if not hasattr(Blocks, self.char):
+                self.char+=str(n)
             print("self.char", self.char)
 
     def _move(self, dir, fly=False):
@@ -1504,7 +1520,6 @@ class Being(BeingItemMixin):
         return 0, 0
 
     def move(self, dir, fly=False):
-        # print("objects[ID.jar_syrup]", objects[ID.jar_syrup])
         B = self.B
         rv = self._move(dir, fly)
         if rv and (rv[0] == LOAD_BOARD):
@@ -2667,10 +2682,11 @@ class ClimbThroughGrillEvent3(Event):
 class AlarmEvent1(Event):
     once=True
     def go(self):
-        self.animate(obj_by_attr.technician1, 'l', n=4)
-        self.player.talk(self.player, ['!ALARM!', 'A few GroboClones attack you and take you to Jail.'])
-        return self.player.move_to_board('1', specials_ind=5)
-        # return Saves().load('start')
+        # disable event, keep the code for reference
+        return
+        # self.animate(obj_by_attr.technician1, 'l', n=4)
+        # self.player.talk(self.player, ['!ALARM!', 'A few GroboClones attack you and take you to Jail.'])
+        # return self.player.move_to_board('1', specials_ind=5)
 
 class GarbageTruckEvent(Event):
     once=True
@@ -2687,8 +2703,10 @@ class ShopKeeperEvent1(Event):
     """Related to ShopKeeperAlarmEvent."""
     once=True
     def go(self):
-        self.player.talk(ID.shopkeeper1)
-        timers.append(Timer(10, ShopKeeperAlarmEvent))
+        # disable, keep code for reference
+        # self.player.talk(ID.shopkeeper1)
+        # timers.append(Timer(10, ShopKeeperAlarmEvent))
+        return
 
 class ShopKeeperAlarmEvent(Event):
     once=True
@@ -2888,7 +2906,8 @@ def dist(a,b):
 
 def main(load_game):
     blt.open()
-    blt.set(f"window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono.ttf, size={SIZE}")
+    SIZE=24
+    blt.set(f"window: resizeable=true, size=79x23, cellsize=auto, title='Little Adventure'; font: FreeMono.ttf, size={SIZE}")
     blt.color("white")
     blt.composition(True)
 
@@ -2938,7 +2957,7 @@ def main(load_game):
     b3.board_3()
     b4.board_4()
     b5.board_5()
-    ins1.board_ins1()
+    #ins1.board_ins1()
     b6.board_6()
     b7.board_7()
     b8.board_8()
@@ -3057,7 +3076,8 @@ def main(load_game):
          [des_und2,des_und,None,None, None,None,None,None, None,None, None, None],
 
          [None,None,None,None, None,None,None, None,top3, top2,top1, None, None],
-         [b1, b2,   b3, b4,    b5, ins1, b6,   b7, b8,    b9, b10, b11, b12],
+         #[b1, b2,   b3, b4,    b5, ins1, b6,   b7, b8,    b9, b10, b11, b12],
+         [b1, b2,   b3, b4,    b5, None, b6,   b7, b8,    b9, b10, b11, b12],
          [und2,None,None,None, None,None,None,None, None,None, None, b13],
 
          [proxima1,proxima2,    museum,   proxima4, mstone,None,None,None, None,None, None, None],
@@ -3386,10 +3406,6 @@ def handle_ui(B, player):
             g.attack(player)
     for s in B.soldiers:
         attack = False
-        if s.id == ID.clone1 and dist(s, player) <= 1:
-            attack = True
-        elif s.id!=ID.clone1 and dist(s, player) <= (1 if player.sneaky_stance else 5):
-            attack = True
         if attack:
             s.hostile = 1
             s.attack(player)
