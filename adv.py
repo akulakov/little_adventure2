@@ -413,10 +413,6 @@ conversations = {
 
     ID.shopkeeper1: ['Twinsen!? I thought you were arrested?', 'They let me out early for good behaviour!', 'But.. nobody gets out of Citadel alive! I.. I.. have to call the guards.'],
 
-    ID.max1: ['Have you seen a young girl being led by two clones?', 'I think I have seen her and I will tell you more if you buy me a drink.'],
-
-    ID.max2: ["I've seen them near the port, it looked like they were getting away from the island, which is strange, because usually prisoners stay in the citadel", 'Thank you!'],
-
     ID.julien: ['Have you seen a young girl being led by two Groboclones?', 'Yes, they were here earlier today, they got on a speedboat and were off. Destination unknown.'],
 
     ID.julien2: ['Do you know anything about the notorious pirate DeForge?', 'I know he had a log where he wrote down every minutae of every day. Wish I had it, it would be sure to be a fascinating read! But it is lost to time. However, the shopkeeper on Principal island might know how to track it down.'],
@@ -666,7 +662,7 @@ class Board:
         TriggerEventLocation(self, specials[1], evt=MaxState1)
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill4)
 
-        TriggerEventLocation(self, specials[3], evt=GroboClonesTakingZoeEvent)
+        # TriggerEventLocation(self, specials[3], evt=GroboClonesTakingZoeEvent)
 
     def board_7(self):
         self.labels.append((10,5, "The Ferry"))
@@ -1719,11 +1715,13 @@ class Being(BeingItemMixin):
                         return new
                     triggered_events.append(DieEvent)
                     status('You fall into the water and drown...')
+                    print('You fall into the water and drown...')
                     return None, None
 
                 if B.found_type_at(Type.deadly, new2):
                     triggered_events.append(DieEvent)
                     status('You fall down onto sharp rocks and die of sustained wounds...')
+                    print('You fall down onto sharp rocks and die of sustained wounds...')
                     return None, None
 
                 if chk_oob(new2) and B.avail(new2) and not B.found_type_at(Type.ladder, new2):
@@ -1889,8 +1887,8 @@ class Being(BeingItemMixin):
             self.talk(obj.brenne)
             obj.fenioux.state = 1
 
-        elif is_near('max_'):
-            MaxQuest().go(self)
+        # elif is_near('max_'):
+        #     MaxQuest().go(self)
 
         elif is_near('chamonix'):
             self.talk(obj.chamonix)
@@ -2943,11 +2941,11 @@ def main(load_game):
     b3 = Board(Loc(2,MAIN_Y), 3)
     b4 = Board(Loc(3,MAIN_Y), 4)
     b5 = Board(Loc(4,MAIN_Y), 5)
-    ins1 = Board(Loc(5,MAIN_Y), 'ins1')
-    b6 = Board(Loc(6,MAIN_Y), 6)
-    b7 = Board(Loc(7,MAIN_Y), 7)
-    b8 = Board(Loc(8,MAIN_Y), 8)
-    b9 = Board(Loc(9,MAIN_Y), 9)
+    # ins1 = Board(Loc(5,MAIN_Y), 'ins1')
+    b6 = Board(Loc(5,MAIN_Y), 6)
+    b7 = Board(Loc(6,MAIN_Y), 7)
+    b8 = Board(Loc(7,MAIN_Y), 8)
+    b9 = Board(Loc(8,MAIN_Y), 9)
 
     player = b1.board_1()
     if DBG:
@@ -3077,7 +3075,7 @@ def main(load_game):
 
          [None,None,None,None, None,None,None, None,top3, top2,top1, None, None],
          #[b1, b2,   b3, b4,    b5, ins1, b6,   b7, b8,    b9, b10, b11, b12],
-         [b1, b2,   b3, b4,    b5, None, b6,   b7, b8,    b9, b10, b11, b12],
+         [b1, b2,   b3, b4,    b5, b6,   b7, b8,    b9, b10, b11, b12],
          [und2,None,None,None, None,None,None,None, None,None, None, b13],
 
          [proxima1,proxima2,    museum,   proxima4, mstone,None,None,None, None,None, None, None],
@@ -3299,10 +3297,13 @@ def handle_ui(B, player):
 
             # ugly but....
             p_loc = Loc(x, y)
+            print(p_loc)
             if chk_b_oob(loc):
                 B = player.move_to_board(boards[loc.y][loc.x]._map, loc=p_loc)
                 B.remove(player)
+                print("player.loc", player.loc)
                 player.loc = player.fall(player.loc)
+                print("2 player.loc", player.loc)
                 B.put(player)
 
     elif k == '.':
@@ -3340,7 +3341,9 @@ def handle_ui(B, player):
             mp += k
             status('> '+mp)
             Windows.refresh()
+            print("map_to_loc.keys()", map_to_loc.keys())
             if mp in map_to_loc:
+                print(f'moving to {mp}')
                 B = player.move_to_board(mp, loc=Loc(40, 5))
                 if B._map=='des_und': player.tele(Loc(7,7))
                 if B._map=='und1': player.tele(Loc(65,7))
