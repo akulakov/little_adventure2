@@ -198,6 +198,9 @@ class Blocks:
 
     crates = (crate1, crate2, crate3, crate4)
 
+#for n,b in Blocks.__dict__.items():
+#    print(n, b)
+
 old_blocks_to_new = {}
 new_blocks_to_old = {}
 for k,v in OldBlocks.__dict__.items():
@@ -410,10 +413,6 @@ descr_by_id.update(
 
 conversations = {
     ID.robobunny1: ['I like to rummage through the rubbish pile.. this area is not closely watched! I hide in the garbage truck and come here when I can. You just have to be very DISCREET!'],
-
-    ID.shopkeeper1: ['Twinsen!? I thought you were arrested?', 'They let me out early for good behaviour!', 'But.. nobody gets out of Citadel alive! I.. I.. have to call the guards.'],
-
-    ID.julien: ['Have you seen a young girl being led by two Groboclones?', 'Yes, they were here earlier today, they got on a speedboat and were off. Destination unknown.'],
 
     ID.julien2: ['Do you know anything about the notorious pirate DeForge?', 'I know he had a log where he wrote down every minutae of every day. Wish I had it, it would be sure to be a fascinating read! But it is lost to time. However, the shopkeeper on Principal island might know how to track it down.'],
 
@@ -647,9 +646,6 @@ class Board:
         Grobo(self, specials[1], id=ID.max_, name='Max')
         RoboBunny(self, specials[2], id=ID.anthony, name='Anthony')
         RoboBunny(self, specials[3], id=ID.graus, name='Mr. Graus')
-
-    def board_ins1(self):
-        self.load_map(self._map)
 
     def board_6(self):
         self.labels.append((2,20, "Twinsen's Home"))
@@ -1076,7 +1072,7 @@ class Board:
                         BlockingItem(self, Blocks.steps_r, '', loc, color=gray_col())
 
                     elif char==OldBlocks.platform2:
-                        BlockingItem(self, Blocks.platform2, '', loc)
+                        Item(self, Blocks.platform2, '', loc)
 
                     elif char==OldBlocks.elephant:
                         g = Grobo(self, loc)
@@ -1715,13 +1711,11 @@ class Being(BeingItemMixin):
                         return new
                     triggered_events.append(DieEvent)
                     status('You fall into the water and drown...')
-                    print('You fall into the water and drown...')
                     return None, None
 
                 if B.found_type_at(Type.deadly, new2):
                     triggered_events.append(DieEvent)
                     status('You fall down onto sharp rocks and die of sustained wounds...')
-                    print('You fall down onto sharp rocks and die of sustained wounds...')
                     return None, None
 
                 if chk_oob(new2) and B.avail(new2) and not B.found_type_at(Type.ladder, new2):
@@ -1908,7 +1902,8 @@ class Being(BeingItemMixin):
             if self.has(ID.architect_pass):
                 status('You show the pass to the soldier.')
                 d=self.B.doors[1]
-                self.B.remove(d)
+                if d in self.B:
+                    self.B.remove(d)
 
         elif is_near('candanchu'):
             self.talk(obj.candanchu)
@@ -2120,7 +2115,7 @@ class Being(BeingItemMixin):
                     l3.state = l4.state = l5.state = 0
                     pl4,pl5,pl6 = obj.platform4, obj.platform5, obj.platform6
                     for pl in (pl4,pl5,pl6):
-                        pl.tele(Loc(pl.x, GROUND-4))
+                        pl.tele(Loc(pl.loc.x, GROUND-4))
 
 
         elif is_near('statue'):
@@ -2182,11 +2177,10 @@ class Being(BeingItemMixin):
     def talk_to_julien(self):
         obj = obj_by_attr
         have_bb = self.has('book_of_bu')
-        self.talk(obj.julien, (ID.julien if not have_bb else ID.julien2))
         if have_bb:
+            self.talk(obj.julien, ID.julien2)
             obj.aubigny.state = 1
-        y = self.talk(obj.julien, ID.julien3, yesno=1)
-        if y:
+        if self.talk(obj.julien, ID.julien3, yesno=1):
             if self.kashes>=10:
                 self.add1(ID.ferry_ticket, 5)
                 self.kashes -= 10
@@ -2955,7 +2949,6 @@ def main(load_game):
     b3.board_3()
     b4.board_4()
     b5.board_5()
-    #ins1.board_ins1()
     b6.board_6()
     b7.board_7()
     b8.board_8()
@@ -3043,6 +3036,7 @@ def main(load_game):
         player.inv[ID.empty_bottle] = 1
         player.inv[ID.magic_flute] = 1
         player.inv[ID.blue_card] = 1
+        player.inv[ID.red_card] = 1
         player.inv[ID.architect_pass] = 1
 
         player.inv[ID.book_of_bu] = 1
@@ -3073,9 +3067,8 @@ def main(load_game):
 
          [des_und2,des_und,None,None, None,None,None,None, None,None, None, None],
 
-         [None,None,None,None, None,None,None, None,top3, top2,top1, None, None],
-         #[b1, b2,   b3, b4,    b5, ins1, b6,   b7, b8,    b9, b10, b11, b12],
-         [b1, b2,   b3, b4,    b5, b6,   b7, b8,    b9, b10, b11, b12],
+         [None,None,None,None, None,None,None,top3, top2, top1, None, None],
+         [b1, b2,   b3, b4,    b5, b6,   b7, b8,    b9,   b10, b11, b12],
          [und2,None,None,None, None,None,None,None, None,None, None, b13],
 
          [proxima1,proxima2,    museum,   proxima4, mstone,None,None,None, None,None, None, None],
@@ -3113,6 +3106,7 @@ def main(load_game):
     Item(None, Blocks.flute,'magic flute', id=ID.magic_flute)
     Item(None, Blocks.magic_ball,'magic ball', id=ID.magic_ball)
     Item(None, 'c','blue card', id=ID.blue_card)
+    Item(None, 'c','red card', id=ID.red_card)
     Item(None, 'p','architect_pass', id=ID.architect_pass)
     Item(None, Blocks.bottle, 'jar of raspberry syrup', id=ID.jar_syrup)
     Item(None, Blocks.wine, 'half bottle of wine', id=ID.wine)
@@ -3122,6 +3116,7 @@ def main(load_game):
     # player.health = 40
     # player.kashes = 50
     player.add1(ID.key1)
+    player.add1(ID.key3)
 
     # only to keep state to unlock Port Beluga
     m = Being(None, None, name='Maurice', char='rabbit', id=ID.maurice, put=0)
@@ -3367,7 +3362,7 @@ def handle_ui(B, player):
         while 1:
             k = parsekey(blt.read())
             if not k: break
-            mp+=k
+            mp+=str(k)
             status(mp)
             Windows.refresh()
             if mp.endswith(' '):
