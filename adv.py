@@ -1041,6 +1041,13 @@ class Board:
                     elif char=='\\':
                         BlockingItem(self, Blocks.angled2, '', loc)
 
+                    elif char==Blocks.platform_top:
+                        BlockingItem(self, Blocks.platform_top, '', loc)
+
+                    elif char==Blocks.soldier_l:
+                        s = Soldier(self, loc)
+                        self.soldiers.append(s)
+
                     # -----------------------------------------------------------------------------------------------
                     elif char == OldBlocks.tree1:
                         col = rand_color(33, (60,255), (10,140))
@@ -1522,7 +1529,7 @@ class Being(BeingItemMixin):
             if self.fight_stance or self.hostile:
                 self.attack(being)
             else:
-                self.switch_places()    # TODO support direction
+                self.switch_places(being, dir)    # TODO support direction
             return True, True
 
         # TODO This is a little messy, doors are by type and keys are by ID
@@ -1725,6 +1732,16 @@ class Being(BeingItemMixin):
                     Windows.refresh()
                     new = new2
                 else:
+                    if isinstance(B[new], Being):
+                        a = B[new]
+                        # try right/left; if can't move anywhere, that generally shouldn't happen because the player
+                        # will be stuck, too
+                        rv = a.move('l')[0]
+                        print("rv", rv)
+                        if rv is None:
+                            rv = a.move('h')
+                            print("2 rv", rv)
+                        Windows.refresh()
                     break
         return new
 
@@ -1769,27 +1786,15 @@ class Being(BeingItemMixin):
                     self.talk(self, conversations[ID.funfrock2])
                     triggered_events.append(EndGameEvent)
 
-    def switch_places(self):
+    def switch_places(self, being, dir):
+        invert = dict(h='l',l='h', j='k', k='j')
         B = self.B
-        r,l = self.loc.mod_r(), self.loc.mod_l()
-        ro = lo = None
-        if chk_oob(r): ro = B[r]
-        if chk_oob(l): lo = B[l]
-
-        if isinstance(ro, Being):
-            B.remove(ro)
-            B.remove(self)
-            loc = self.loc
-            self.put(r)
-            ro.put(loc)
-            status(f'{self} moved past {ro._name}')
-        elif isinstance(lo, Being):
-            B.remove(lo)
-            B.remove(self)
-            loc = self.loc
-            self.put(l)
-            lo.put(loc)
-            status(f'{self} moved past {lo._name}')
+        B.remove(being)
+        B.remove(self)
+        loc = self.loc
+        self.put(being.loc)
+        being.put(loc)
+        status(f'{self} moved past {being._name}')
 
     def loot(self, B, cont):
         if cont.id==ID.treasure_chest and B.state==0:
@@ -3675,5 +3680,7 @@ if __name__ == "__main__":
             SIZE = int(a[2:])
     if first(argv) == 'ed':
         editor(argv[1])
+    elif first(argv) == 'map':
+        main(argv[1])
     else:
         main(load_game)
