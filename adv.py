@@ -21,7 +21,7 @@ import shelve
 
 oprint = print
 
-__version__ = (0,4,3)
+__version__ = (0,4,7)
 
 rock = '█'
 blank = ' '
@@ -421,8 +421,6 @@ conversations = {
 
     ID.guard2: ['Hey! I think the stone is loose in my cell! I might escape..', "Hmm, that's odd, I remember checking the camera earlier.. I guess there's no harm in checking again!"],
 
-    ID.chamonix: ['Have you seen a young girl being led by two Groboclones?', "I haven't seen them.. ", "Here's something strange: I found a page torn out of a book which said, 'pull the middle lever once first then pull the right lever once.' Must be some kind of puzzle.", "I'm really enjoying a book about all kinds of wonders, one of them being a Clear Water Lake in the Himalayi mountains!"],
-
     ID.agen: ["Did you know Dr. FunFrock installed his busts to protect and defend us? The ones that don't have pedestals are covering ancient undestructible seals that could put the entire system of governance in danger!"],
 
     ID.brenne: ["I've heard you fought some soldiers and clones, I guess I can trust you.. You should see my brother on the Proxima Island, I know that he made a fake red card. Just tell him the word 'Amos'. He lives in a red house, it's hard to miss."],
@@ -526,8 +524,12 @@ conversations = {
 def mkcell():
     return [blank]
 
+WIDTH = 79
+W_MID = WIDTH//2
+H_MID = HEIGHT//2
+
 def mkrow():
-    return [mkcell() for _ in range(79)]
+    return [mkcell() for _ in range(WIDTH)]
 
 
 class Loc:
@@ -565,6 +567,12 @@ class Loc:
 
     def mod_u(self):
         return self.mod(-1, 0)
+
+    def shift_to_edge(self):
+        "If left of center, shift to left edge, otherwise to right edge."
+        new = copy(self)
+        new.x = 0 if self.x<W_MID else WIDTH-1
+        return new
 
 def map_to_board(_map):
     #print("map_to_loc", map_to_loc)
@@ -663,9 +671,9 @@ class Board:
     def board_7(self):
         self.labels.append((10,5, "The Ferry"))
         containers, crates, doors, specials = self.load_map(self._map)
-        julien, clone1 = specials[Blocks.elephant_l]
+        julien = Being(self, specials[3], id=ID.julien, name='Julien', char=Blocks.elephant_l)
+        clone1 = Being(self, specials[4], id=ID.clone1, char=Blocks.elephant_l)
         clone1.inv[ID.key3] = 1
-        julien.id = ID.julien
         objects[julien.id] = julien
         doors[0].type = Type.door3
         Item(self, Blocks.grill, 'grill', specials[1], id=ID.grill4)
@@ -744,7 +752,7 @@ class Board:
         s=Item(self, 'ferry', 'Sailboat', specials[8], id=ID.sailboat)
         s.state=1
         Being(self, specials[3], id=ID.buzancais, name='Buzancais', char='cow')
-        self[Loc(41,6 )].color = 'blue'
+        #self[Loc(41,6 )].color = 'blue'
 
     # -- White Leaf Desert --------------------------------------------------------------------------
 
@@ -921,8 +929,9 @@ class Board:
         Item(self, Blocks.medallion, "Sendell Medallion", specials[4], id=ID.sendell_medallion)
 
     def board_sea1(self):
-        specials = self.load_map(self._map)[3]
-        Item(self, 'ferry', 'ferry', specials[1], id=ID.ferry)
+        self.load_map(self._map)
+        #specials = self.load_map(self._map)[3]
+        #Item(self, 'ferry', 'ferry', specials[1], id=ID.ferry)
 
     def board_landscape1(self):
         self.load_map(self._map)
@@ -1039,6 +1048,12 @@ class Board:
                         BlockingItem(self, Blocks.angled1, '', loc)
 
                     elif char=='\\':
+                        BlockingItem(self, Blocks.angled2, '', loc)
+
+                    elif char==Blocks.angled1:
+                        BlockingItem(self, Blocks.angled1, '', loc)
+
+                    elif char==Blocks.angled2:
                         BlockingItem(self, Blocks.angled2, '', loc)
 
                     elif char==Blocks.platform_top:
@@ -1331,9 +1346,11 @@ class Item(BeingItemMixin):
     def move(self, dir, n=1, fly=False):
         m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0))[dir]
         for _ in range(n):
+            print("self.loc", self.loc)
             new = self.loc.mod(*m)
             self.B.remove(self)
             self.loc = new
+            print("new", new)
             self.B.put(self)
 
 class BlockingItem(Item):
@@ -1889,9 +1906,6 @@ class Being(BeingItemMixin):
         # elif is_near('max_'):
         #     MaxQuest().go(self)
 
-        elif is_near('chamonix'):
-            self.talk(obj.chamonix)
-
         elif is_near('tartas'):
             self.talk(obj.tartas)
             brundle = map_to_board('brundle')
@@ -2241,7 +2255,7 @@ class Being(BeingItemMixin):
         if y:
             if self.kashes>=10:
                 self.kashes-=10
-                ch = self.talk(self, [f'Where would you like to go?', lnames])
+                ch = self.talk(self, [f'Where would you like to go?' + ' '*30, lnames])
                 if ch:
                     dest = dests[ch-1]
                     triggered_events.append((TravelBySailboat, dict(dest=dest[1], dests=dests)))
@@ -2377,7 +2391,7 @@ class Event:
         for _ in range(height):
             self.animate(item, 'j', n=height, carry_item=carry_item, sleep_time=sleep_time)
 
-    def animate(self, items, dir, B=None, n=999, carry_item=None, sleep_time=SLP*4):
+    def animate(self, items, dir, B=None, n=999, carry_item=None, sleep_time=SLP*4, to_special=None):
         if not isinstance(items, SEQ_TYPES):
             items = [items]
         B = B or self.B
@@ -2388,10 +2402,15 @@ class Event:
                     carry_item.move(dir, fly=1)
                 B.draw()
                 sleep(sleep_time)
-                if item.loc.x==0:
+                if item.loc.x==0 or item.loc.x==78:
                     B.remove(item)
                     if carry_item:
                         B.remove(carry_item)
+                    return
+                if to_special is not None:
+                    print("B.specials[to_special]", B.specials[to_special])
+                    print(B.specials)
+                if to_special is not None and item.loc == B.specials[to_special]:
                     return
 
 class JailEvent(Event):
@@ -2513,17 +2532,33 @@ class TravelByFerry(Event):
     def go(self):
         dest = self.kwargs.get('dest')
         player = objects[ID.player]
-        B = map_to_board('sea1')
+        self.B.remove(player)
         ferry = obj_by_attr.ferry
+        self.animate(ferry, 'h')
+        B = map_to_board('sea1')
         B.put(ferry, Loc(78,GROUND+1))
         self.animate(ferry, 'h', B=B)
         status('The ferry took you to ' + ('Principal Island' if dest=='8' else 'Citadel Island'))
         if dest == '8':
-            ferry.move_to_board(dest, 0)
-            return player.move_to_board('8', 9)
+            ferry.move_to_board(dest, loc=Loc(0, GROUND+1))
+            triggered_events.append((TravelArrival, dict(to_special=0, dest=dest, obj=ferry, player_to=9)))
+            return map_to_board('8')
         elif dest == '7':
-            ferry.move_to_board(dest, 8)
-            return player.move_to_board('7', 9)
+            ferry.move_to_board(dest, 7)
+            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=ferry, player_to=9)))
+            return map_to_board('7')
+
+class TravelArrival(Event):
+    once=False
+    def go(self):
+        kw = self.kwargs
+        B = map_to_board(kw['dest'])
+        player_to = kw['player_to']
+        loc = B.specials[player_to]
+        d = 'l' if loc.x<40 else 'h'
+        self.animate(kw['obj'], d, B=B, to_special=kw['to_special'])
+        obj_by_attr.player.move_to_board(B._map, player_to)
+        return B
 
 class TravelByCarEvent(Event):
     once = False
@@ -2563,24 +2598,48 @@ class TravelBySailboat(Event):
         player = objects[ID.player]
         B = map_to_board('sea1')
         sailboat = objects[ID.sailboat]
-        B.put(sailboat, Loc(78, GROUND+1))
-        self.animate(sailboat, 'h', B=B)
+        if player.loc.x<40:
+            x=78
+            d='h'
+        else:
+            x=0
+            d='l'
+
+        start = Loc(x, GROUND+1)
+        B.put(sailboat, start)
+        self.animate(sailboat, d, B=B)
         status(f'The sailboat took you to {lname}')
         obj = obj_by_attr
         dest_B = map_to_board(dest)
 
         if dest == 'desert1':
-            sailboat.move_to_board(dest, 8)
-            return player.move_to_board(dest, 9)
+            B = map_to_board('desert1')
+            sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+            return B
+            # sailboat.move_to_board(dest, 8)
+            # return player.move_to_board(dest, 9)
         elif dest == 'beluga':
-            sailboat.move_to_board(dest, 8)
-            return player.move_to_board(dest, 9)
+            B = map_to_board('beluga')
+            sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+            return B
+            # sailboat.move_to_board(dest, 8)
+            # return player.move_to_board(dest, 9)
         elif dest == 'proxima1':
-            sailboat.move_to_board(dest, 8)
-            return player.move_to_board(dest, 9)
+            B = map_to_board('proxima1')
+            sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+            return B
+            # sailboat.move_to_board(dest, 8)
+            # return player.move_to_board(dest, 9)
         elif dest == 'himalaya1':
-            sailboat.move_to_board(dest, 8)
-            return player.move_to_board(dest, 9)
+            B = map_to_board('himalaya1')
+            sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+            return B
+            # sailboat.move_to_board(dest, 8)
+            # return player.move_to_board(dest, 9)
 
 
 class TravelByDynofly(Event):
@@ -2901,9 +2960,9 @@ def dist(a,b):
     return max(abs(a.loc.x - b.loc.x),
                abs(a.loc.y - b.loc.y))
 
-def main(load_game):
+def main(load_game=None, map=None):
     blt.open()
-    SIZE=24
+    SIZE=20
     blt.set(f"window: resizeable=true, size=79x23, cellsize=auto, title='Little Adventure'; font: FreeMono.ttf, size={SIZE}")
     blt.color("white")
     blt.composition(True)
@@ -3043,6 +3102,7 @@ def main(load_game):
         player.inv[ID.blue_card] = 1
         player.inv[ID.red_card] = 1
         player.inv[ID.architect_pass] = 1
+        player.inv[ID.jar_syrup] = 1
 
         player.inv[ID.book_of_bu] = 1
         Item(None, 'ferry', 'sailboat', id=ID.sailboat)
@@ -3128,6 +3188,9 @@ def main(load_game):
     m.state=1
 
     Saves().save(B.loc, 'start')
+    if map:
+        player.move_to_board(map, loc=Loc(40,5))
+        B = map_to_board(map)
 
     while 1:
         rv = handle_ui(B, player)
@@ -3419,7 +3482,9 @@ def handle_ui(B, player):
         Windows.win2.addstr(1, 0, f'Hmm.. it looks like you lost the game!')
         player, B = Saves().load('start')
 
-    for evt in triggered_events:
+    #for evt in triggered_events:
+    while triggered_events:
+        evt = triggered_events.pop(0)
         if evt==EndGameEvent:
             return
         kwargs = {}
@@ -3427,14 +3492,17 @@ def handle_ui(B, player):
             evt, kwargs = evt
         if evt in done_events and evt.once:
             continue
+        print("evt", evt)
         rv = evt(B, **kwargs).go()
         if isinstance(rv, Board):
             B = rv
-        try:
-            player, B = rv
-        except Exception as e:
-            print("e", e)
-            pass
+        else:
+            try:
+                player, B = rv
+            except Exception as e:
+                print("rv", rv)
+                print("e", e)
+                pass
         done_events.add(evt)
 
     triggered_events.clear()
@@ -3470,7 +3538,7 @@ print=debug
 
 def editor(_map):
     blt.open()
-    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono.ttf, size=24")
+    blt.set("window: resizeable=true, size=80x25, cellsize=auto, title='Little Adventure'; font: FreeMono.ttf, size=20")
     blt.color("white")
     blt.composition(True)
 
@@ -3674,6 +3742,8 @@ if __name__ == "__main__":
     for a in argv:
         if a == '-d':
             DBG = True
+            argv.remove('-d')
+            break
         if a and a.startswith('-l'):
             load_game = a[2:]
         if a and a.startswith('-s'):
@@ -3681,6 +3751,6 @@ if __name__ == "__main__":
     if first(argv) == 'ed':
         editor(argv[1])
     elif first(argv) == 'map':
-        main(argv[1])
+        main(map=argv[1])
     else:
         main(load_game)
