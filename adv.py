@@ -196,6 +196,8 @@ class Blocks:
     cornice_l = '\u26e3'
     cornice_r = '\u26e4'
 
+    cloud = '\u26e7'
+
     crates = (crate1, crate2, crate3, crate4)
 
 #for n,b in Blocks.__dict__.items():
@@ -352,7 +354,6 @@ class ID:
     clermont_ferrand3 = 126
     aubigny = 127
     olivet = 128
-    olivet2 = 129
     julien2 = 130
     wally = 131
     wally2 = 132
@@ -391,8 +392,6 @@ class ID:
     talk_to_brenne = 203
     water_supply = 204
     mstone2_exit = 205
-    zoe_taken = 206
-    zoe_taken2 = 207
     safe_note = 208
     lake_ice_breaking = 209
 
@@ -417,7 +416,7 @@ conversations = {
     ID.julien2: ['Do you know anything about the notorious pirate DeForge?', 'I know he had a log where he wrote down every minutae of every day. Wish I had it, it would be sure to be a fascinating read! But it is lost to time. However, the shopkeeper on Principal island might know how to track it down.'],
 
     ID.soldier2: ['Wait! How did you get here, and who are you?',
-                  ["I'm Twinsen, I'm escaping!", "Fixing the antenna.", "Santa Claus."]],
+                  ["Fixing the antenna.", "Santa Claus."]],
 
     ID.guard2: ['Hey! I think the stone is loose in my cell! I might escape..', "Hmm, that's odd, I remember checking the camera earlier.. I guess there's no harm in checking again!"],
 
@@ -453,15 +452,13 @@ conversations = {
     ID.locksmith: ['Ahh! You know the secret passage! I know I can trust you...', 'I would like to see the Astronomer',
                    'Very well, I will open the door for you.'],
 
-    ID.astronomer: ['Have you..', "I know that you are looking for your friend, but I haven't seen her. It's very odd that she was taken from Citadel island",
+    ID.astronomer: ['Have you..', "It's very odd that she was taken from Citadel island",
                     'I feel that Dr. FunFrock is afraid of something related to the Legend. If you find out what it is, you may be able to help your friend.', 'Go to port Beluga, and talk to my dear friend Maurice, he will help you get off the island.'
                    ],
 
     ID.legend1: ['The secret of the Prophecy, which is now often called simply The Legend, can be found somewhere in the White Leaf Desert.'],
 
     ID.olivet: ['Can you tell me anything about the Legend?', 'Yes, I do know some details that may interest you.. but I can only tell you in exchange for the book of knowledge that I am sorely missing. You can find the book of knowledge in the Temple of Bu. The entrance is right here....'],
-
-    ID.olivet2: ['I now see that you are the chosen one. You can keep the Book of Bu. It will let you decipher runes and speak to the animals.', 'I do not know how you can defeat Dr. FunFrock, but I know that you must. I wish I could help you.', 'Something tells me your parents must have left a clue or a direction at your home to help you along. Perhaps it is a good time to return home.'],
 
     ID.olivet3: "It's a nice flute you have there! If you don't need it anymore, would you like to trade it for my guitar?",
 
@@ -494,8 +491,6 @@ conversations = {
 
     ID.elf: ["So glad you are here! I was stuck behind the seal for no less than 4 thousand and not more than 400 million years! (I have lost count at some point).", "I'm sure you'll find this blue card useful in your travels.."],
 
-    ID.sever: ["This dance night is going nowhere..... fast! The luck has it that the accompanist stored his guitar for a year without a case, and it got so dusty that he began sneezing like a fou, and dropped the guitar. Now it has a crack in it. If you could only bring me a guitar.. I would help you find your way!"],
-
     ID.candanchu: ["I stole this key from a guard, but I don't need it anymore.."],
 
     ID.graus: ["I'm on a special assignment from Dr. FunFrock, I need the plans for the Teleportation Center!", "Very well, you should go to the center and look around. You are trying to find that miscontent who's been going around causing a ruckus? Would you knock some sense into him if you find him? Anyway, I guess my whole weekend is ruined by all this work with the Center plans.. Here is the pass, and please bring it back when done."],
@@ -509,10 +504,6 @@ conversations = {
     ID.funfrock: ["You see Dr. FunFrock appear.", "He looks at you menacingly", "All of the nonsense with breaking of seals and attacking my soldiers and the prophecy is now over! Jailbirds belong in jail, and you are going back home!!!"],
 
     ID.funfrock2: ["You see Dr. FunFrock dying, surprised that he lost so utterly.", "He looks at you menacingly one last time.", "You return home with your wife Zoe.", "Without commanding influence of Dr. FunFrock, the clones put up little to no resistence.", "You feel that Sendell is content, and all of the citizens of Twinsun are happy!!"],
-
-    ID.zoe_taken: ["Suddenly you see your wife, Zoe, emerge from your home, accompanied by two GroboClones."],
-
-    ID.zoe_taken2: ["You try to follow them but a third GroboClone jumps as if from under ground, whacks you with a baton right over your head, and that's the last thing you remember."],
 
     ID.julien3: 'You may be able to find out more on Principal Island. I wanted to use these 5 ferry tickets myself but I can guess I can sell them to you for some 10 kashes so that I can buy some candy..',
 
@@ -573,6 +564,10 @@ class Loc:
         new = copy(self)
         new.x = 0 if self.x<W_MID else WIDTH-1
         return new
+
+    def is_near(self, l):
+        return abs(self.x - l.x) <= 1 and abs(self.y - l.y) <= 1
+
 
 def map_to_board(_map):
     #print("map_to_loc", map_to_loc)
@@ -665,8 +660,6 @@ class Board:
 
         TriggerEventLocation(self, specials[1], evt=MaxState1)
         Item(self, Blocks.grill, 'grill', specials[2], id=ID.grill4)
-
-        # TriggerEventLocation(self, specials[3], evt=GroboClonesTakingZoeEvent)
 
     def board_7(self):
         self.labels.append((10,5, "The Ferry"))
@@ -914,7 +907,7 @@ class Board:
 
     def board_dynofly(self):
         containers, crates, doors, specials = self.load_map(self._map)
-        Being(self, specials[1], name='Dynofly', char='dynofly', id=ID.dynofly)
+        Being(self, specials[8], name='Dynofly', char='dynofly', id=ID.dynofly)
 
     # -----------------------------------------------------------------------------------------------
 
@@ -1475,7 +1468,7 @@ class Being(BeingItemMixin):
                     k = parsekey(blt.read())
                     try:
                         k=int(k)
-                    except ValueError:
+                    except (ValueError, TypeError):
                         k = 0
                     if k in range(1, multichoice+1):
                         return k
@@ -1487,7 +1480,7 @@ class Being(BeingItemMixin):
                 for _ in range(10):
                     k = parsekey(blt.read())
                     if k==' ': break
-                    i+=k
+                    i+=str(k)
                     Windows.win2.addstr(1,0, '> '+i)
                     Windows.refresh()
                 return i
@@ -1527,13 +1520,18 @@ class Being(BeingItemMixin):
             print("self.char", self.char)
 
     def _move(self, dir, fly=False):
-        m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0))[dir]
+        m = dict(h=(0,-1), l=(0,1), j=(1,0), k=(-1,0), y=(-1,-1), u=(-1,1), n=(1,-1), m=(1,1) )[dir]
         if chk_oob(self.loc, *m):
             return True, self.loc.mod(*m)
         else:
             if self.is_player and chk_b_oob(self.B.loc, *m):
                 return LOAD_BOARD, self.B.loc.mod(*m)
         return 0, 0
+
+    def simple_move(self, to):
+        self.B.remove(self)
+        self.loc = to
+        self.B.put(self)
 
     def move(self, dir, fly=False):
         B = self.B
@@ -1942,13 +1940,6 @@ class Being(BeingItemMixin):
             self.talk(obj.graus)
             self.inv[ID.architect_pass] = 1
 
-        elif is_near('sever'):
-            self.talk(obj.sever)
-            if self.has(ID.guitar):
-                self.talk(obj.sever, 'Oh you do have a guitar? May I have it? I am so happy! I will open the way for you at once.')
-                self.inv[ID.guitar] = 0
-                B.remove(B[B.specials[2]])
-
         elif is_near('red_door') and self.has(ID.red_card):
             B.remove(obj.red_door)
 
@@ -1962,17 +1953,18 @@ class Being(BeingItemMixin):
             triggered_events.append((PortalEvent, dict(map='marked_stone', spawn_specials_ind=1)))
 
         elif is_near('marked_stone'):
-            resp = self.talk(self, ['To free the Eclipse stone, speak the word DAX', 'Which word will free me?'], resp=True)
+            resp = self.talk(self, ['To free the Marked stone, speak the word DAX', 'Which word will free me?'], resp=True)
             if resp.lower()=='odos':
                 status('You see the mighty stone disappear and countless hearts appear at your feet!')
                 for _ in range(7):
                     B.put(obj.grn_heart, self.loc)
 
         elif is_near('eclipse_stone'):
-            resp = self.talk(self, ['To free the Marked stone, speak the word ODOS', 'Which word will free me?'], resp=True)
+            resp = self.talk(self, ['To free the Eclipse stone, speak the word ODOS', 'Which word will free me?'], resp=True)
             if resp.lower()=='dax':
                 status('You see the mighty stone disappear and a magic flute floats into your hand!')
                 self.inv[ID.magic_flute] = 1
+                self.B.remove(obj_by_attr.eclipse_stone)
 
         elif is_near('alarm_tech'):
             self.talk(obj.alarm_tech)
@@ -2102,11 +2094,13 @@ class Being(BeingItemMixin):
             status('You have found the Book of Bu.')
 
         elif is_near('lever1'):
-            B.remove(B.doors[1])
+            if B.doors[1] in B:
+                B.remove(B.doors[1])
 
         elif is_near('lever2'):
             triggered_events.append(MovePlatform3Event)
 
+        # solution: lever4, then lever 3; if positions are messed up, lever5 a few times to reset
         elif is_near('lever3'):
             if obj.lever3.state==0 and obj.lever5.state==0 and obj.lever4.state==1:
                 dir = 'k' if obj.platform6.loc.y>5 else 'j'
@@ -2134,7 +2128,7 @@ class Being(BeingItemMixin):
                     l3.state = l4.state = l5.state = 0
                     pl4,pl5,pl6 = obj.platform4, obj.platform5, obj.platform6
                     for pl in (pl4,pl5,pl6):
-                        pl.tele(Loc(pl.loc.x, GROUND-4))
+                        pl.tele(Loc(pl.loc.x, GROUND-3))
 
 
         elif is_near('statue'):
@@ -2231,7 +2225,7 @@ class Being(BeingItemMixin):
 
     def talk_to_olivet(self):
         obj = obj_by_attr
-        self.talk(obj.olivet, ID.olivet2 if self.has(ID.book_of_bu) else ID.olivet)
+        self.talk(obj.olivet, ID.olivet)
         if self.has(ID.magic_flute):
             y = self.talk(obj.olivet, ID.olivet3, yesno=1)
             if y:
@@ -2255,7 +2249,8 @@ class Being(BeingItemMixin):
         if y:
             if self.kashes>=10:
                 self.kashes-=10
-                ch = self.talk(self, [f'Where would you like to go?' + ' '*30, lnames])
+                self.B.draw()
+                ch = self.talk(self, [f'Where would you like to go?' + ' '*50, lnames])
                 if ch:
                     dest = dests[ch-1]
                     triggered_events.append((TravelBySailboat, dict(dest=dest[1], dests=dests)))
@@ -2391,18 +2386,65 @@ class Event:
         for _ in range(height):
             self.animate(item, 'j', n=height, carry_item=carry_item, sleep_time=sleep_time)
 
-    def animate(self, items, dir, B=None, n=999, carry_item=None, sleep_time=SLP*4, to_special=None):
+    def animate(self, items, dir=None, B=None, n=999, carry_item=None, sleep_time=SLP*4, to_special=None, fly=False):
         if not isinstance(items, SEQ_TYPES):
             items = [items]
         B = B or self.B
+        print('dir, to_special', dir, to_special)
+        ###
+        # animate a sloped line
+        ###
+        if not dir and to_special:
+            to = B.specials[to_special]
+            item = items[0]
+            l = item.loc
+            print('l,to',l, to)
+            dltx = to.x-l.x
+            dlty = to.y-l.y
+            right = dltx>0
+            down = dlty>0
+            xyrat = dltx/dlty
+            print(dltx, dlty,right,down,xyrat)
+            lst = []
+            x = y = 0
+            for _ in range(WIDTH + 10):
+                if xyrat > 1:
+                    cy = int(y>1)
+                    y_ = cy if down else -cy
+                    if l.y==to.y:
+                        y_=0
+                    l = l.mod(y_, 1 if right else -1)
+                    lst.append(l)
+                    if cy:
+                        y-=1
+                    y+= 1/xyrat
+                else:
+                    cx = int(x>1)
+                    x_ = cx if right else -cx
+                    if l.x==to.x:
+                        x_=0
+                    l = l.mod(1 if down else -1, x_)
+                    lst.append(l)
+                    if cx:
+                        x-=1
+                    x+= xyrat
+                print("l", l)
+                if l.is_near(to):
+                    lst.append(to)
+                    for l in lst:
+                        items[0].simple_move(l)
+                        B.draw()
+                        sleep(sleep_time)
+                    return
+
         for _ in range(n):
             for item in items:
-                item.move(dir)
+                item.move(dir, fly=fly)
                 if carry_item:
                     carry_item.move(dir, fly=1)
                 B.draw()
                 sleep(sleep_time)
-                if item.loc.x==0 or item.loc.x==78:
+                if item.loc.x==0 or item.loc.x==78 or item.loc.y==0 or item.loc.y==HEIGHT:
                     B.remove(item)
                     if carry_item:
                         B.remove(carry_item)
@@ -2554,9 +2596,19 @@ class TravelArrival(Event):
         kw = self.kwargs
         B = map_to_board(kw['dest'])
         player_to = kw['player_to']
+        to_special = kw['to_special']
+        obj = kw['obj']
+
         loc = B.specials[player_to]
-        d = 'l' if loc.x<40 else 'h'
-        self.animate(kw['obj'], d, B=B, to_special=kw['to_special'])
+        to_loc = B.specials[to_special]
+        print("loc", loc)
+        print("to_loc", to_loc)
+        print("to_special", to_special)
+        print("player_to", player_to)
+        d = None
+        if obj.loc.y == to_loc.y:
+            d = 'l' if loc.x<40 else 'h'
+        self.animate(obj, d, B=B, to_special=to_special)
         obj_by_attr.player.move_to_board(B._map, player_to)
         return B
 
@@ -2610,36 +2662,39 @@ class TravelBySailboat(Event):
         self.animate(sailboat, d, B=B)
         status(f'The sailboat took you to {lname}')
         obj = obj_by_attr
-        dest_B = map_to_board(dest)
+        B = map_to_board(dest)
+        sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+        triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+        return B
 
-        if dest == 'desert1':
-            B = map_to_board('desert1')
-            sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
-            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
-            return B
-            # sailboat.move_to_board(dest, 8)
-            # return player.move_to_board(dest, 9)
-        elif dest == 'beluga':
-            B = map_to_board('beluga')
-            sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
-            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
-            return B
-            # sailboat.move_to_board(dest, 8)
-            # return player.move_to_board(dest, 9)
-        elif dest == 'proxima1':
-            B = map_to_board('proxima1')
-            sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
-            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
-            return B
-            # sailboat.move_to_board(dest, 8)
-            # return player.move_to_board(dest, 9)
-        elif dest == 'himalaya1':
-            B = map_to_board('himalaya1')
-            sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
-            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
-            return B
-            # sailboat.move_to_board(dest, 8)
-            # return player.move_to_board(dest, 9)
+        # if dest == 'desert1':
+        #     B = map_to_board('desert1')
+        #     sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+        #     triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+        #     return B
+        #     # sailboat.move_to_board(dest, 8)
+        #     # return player.move_to_board(dest, 9)
+        # elif dest == 'beluga':
+        #     B = map_to_board('beluga')
+        #     sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+        #     triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+        #     return B
+        #     # sailboat.move_to_board(dest, 8)
+        #     # return player.move_to_board(dest, 9)
+        # elif dest == 'proxima1':
+        #     B = map_to_board('proxima1')
+        #     sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+        #     triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+        #     return B
+        #     # sailboat.move_to_board(dest, 8)
+        #     # return player.move_to_board(dest, 9)
+        # elif dest == 'himalaya1':
+        #     B = map_to_board('himalaya1')
+        #     sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
+        #     triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
+        #     return B
+        #     # sailboat.move_to_board(dest, 8)
+        #     # return player.move_to_board(dest, 9)
 
 
 class TravelByDynofly(Event):
@@ -2649,11 +2704,20 @@ class TravelByDynofly(Event):
         dests = self.kwargs.get('dests')
         lname = first([ln for ln,m in dests if m==dest])
         obj = obj_by_attr
+        p, dyno = obj_by_attr.player, obj_by_attr.dynofly
         status(f'Dynofly took you to {lname}')
+        B = map_to_board(dest)
+        self.animate(dyno, 'u', fly=True)
+        obj.dynofly.move_to_board(dest, loc=Loc(0,0))
+        triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=dyno, player_to=9)))
+        return B
 
         if dest == 'f_island':
-            obj.dynofly.move_to_board(dest, 8)
-            return obj.player.move_to_board(dest, 9)
+            B = map_to_board('f_island')
+            self.animate(dyno, 'y')
+            obj.dynofly.move_to_board(dest, Loc(0,0))
+            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=dyno, player_to=9)))
+            return B
         elif dest == 'brundle':
             obj.dynofly.move_to_board(dest, 8)
             return obj.player.move_to_board(dest, 9)
@@ -2664,22 +2728,6 @@ class TravelByDynofly(Event):
 
 class EndGameEvent(Event):
     pass
-
-class GroboClonesTakingZoeEvent(Event):
-    once=True
-    def go(self):
-        B=self.B
-        specials=B.specials
-        pl = self.player
-        a=Being(B, specials[4], name='GroboClone', char='elephant')
-        b=Being(B, specials[5], name='Zoe', char=Blocks.zoe)
-        c=Being(B, specials[6], name='GroboClone', char='elephant')
-        pl.talk(pl, ID.zoe_taken)
-        self.animate((a,b,c), 'h', sleep_time=0.3)
-        B.remove(b)
-        B.remove(c)
-        pl.talk(pl, ID.zoe_taken2)
-
 
 class GuardAttackEvent1(Event):
     once=False
@@ -2960,7 +3008,7 @@ def dist(a,b):
     return max(abs(a.loc.x - b.loc.x),
                abs(a.loc.y - b.loc.y))
 
-def main(load_game=None, map=None):
+def main(load_game=None, map=None, x_loc=None):
     blt.open()
     SIZE=20
     blt.set(f"window: resizeable=true, size=79x23, cellsize=auto, title='Little Adventure'; font: FreeMono.ttf, size={SIZE}")
@@ -3114,13 +3162,13 @@ def main(load_game=None, map=None):
     landscape1 = Board(Loc(2,last_row), 'landscape1')
     landscape1.board_landscape1()
     wtower = Board(Loc(3,last_row), 'wtower')
-    beluga = Board(Loc(4,last_row), 'beluga')
+    beluga = Board(Loc(5,last_row), 'beluga')
     beluga.board_beluga()
-    elf_lab = Board(Loc(5,last_row), 'elf_lab')
+    elf_lab = Board(Loc(6,last_row), 'elf_lab')
     elf_lab.board_elf_lab()
-    mstone2 = Board(Loc(6,last_row), 'marked_stone2')
+    mstone2 = Board(Loc(7,last_row), 'marked_stone2')
     mstone2.board_mstone2()
-    brundle = Board(Loc(7,last_row), 'brundle')
+    brundle = Board(Loc(8,last_row), 'brundle')
     brundle.board_brundle()   # this needs to be after `board_dynofly()`
 
     und1.board_und1()
@@ -3145,7 +3193,7 @@ def main(load_game=None, map=None):
          [None,  None,       None,None, None,None,None,None, None,None, None, None],
 
          # Unconnected maps
-         [und1,  sea1,       landscape1, wtower, beluga, elf_lab, mstone2, brundle, None,None, None, None],
+         [und1,  sea1,       landscape1, wtower, None, beluga, elf_lab, mstone2, brundle, None,None, None, None],
     )
 
     # stdscr.clear()
@@ -3189,7 +3237,7 @@ def main(load_game=None, map=None):
 
     Saves().save(B.loc, 'start')
     if map:
-        player.move_to_board(map, loc=Loc(40,5))
+        player.move_to_board(map, loc=Loc(x_loc or 40,5))
         B = map_to_board(map)
 
     while 1:
@@ -3739,18 +3787,25 @@ def editor(_map):
 if __name__ == "__main__":
     argv = sys.argv[1:]
     load_game = None
-    for a in argv:
-        if a == '-d':
+    x_loc = None
+    while argv:
+        a = argv[0]
+        if a and a.startswith('-X'):
+            x_loc = int(a[2:])
+            argv.remove(a)
+        elif a == '-d':
             DBG = True
             argv.remove('-d')
             break
-        if a and a.startswith('-l'):
+        elif a and a.startswith('-l'):
             load_game = a[2:]
-        if a and a.startswith('-s'):
+        elif a and a.startswith('-s'):
             SIZE = int(a[2:])
+        else:
+            break
     if first(argv) == 'ed':
         editor(argv[1])
     elif first(argv) == 'map':
-        main(map=argv[1])
+        main(map=argv[1], x_loc=x_loc)
     else:
-        main(load_game)
+        main(load_game, x_loc=x_loc)
