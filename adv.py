@@ -2560,10 +2560,6 @@ class MovePlatform3Event(Event):
         if i==p or i is blank: i=None
         self.animate_arc(p, to_loc=(a if p.loc==b else b), carry_item=i)
 
-# class StatueInPlace(Event):
-#     once=True
-#     def go(self):
-
 class LeaveBuEvent(Event):
     once=False
     def go(self):
@@ -2601,10 +2597,6 @@ class TravelArrival(Event):
 
         loc = B.specials[player_to]
         to_loc = B.specials[to_special]
-        print("loc", loc)
-        print("to_loc", to_loc)
-        print("to_special", to_special)
-        print("player_to", player_to)
         d = None
         if obj.loc.y == to_loc.y:
             d = 'l' if loc.x<40 else 'h'
@@ -2667,36 +2659,6 @@ class TravelBySailboat(Event):
         triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
         return B
 
-        # if dest == 'desert1':
-        #     B = map_to_board('desert1')
-        #     sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
-        #     triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
-        #     return B
-        #     # sailboat.move_to_board(dest, 8)
-        #     # return player.move_to_board(dest, 9)
-        # elif dest == 'beluga':
-        #     B = map_to_board('beluga')
-        #     sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
-        #     triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
-        #     return B
-        #     # sailboat.move_to_board(dest, 8)
-        #     # return player.move_to_board(dest, 9)
-        # elif dest == 'proxima1':
-        #     B = map_to_board('proxima1')
-        #     sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
-        #     triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
-        #     return B
-        #     # sailboat.move_to_board(dest, 8)
-        #     # return player.move_to_board(dest, 9)
-        # elif dest == 'himalaya1':
-        #     B = map_to_board('himalaya1')
-        #     sailboat.move_to_board(dest, loc=B.specials[8].shift_to_edge())
-        #     triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=sailboat, player_to=9)))
-        #     return B
-        #     # sailboat.move_to_board(dest, 8)
-        #     # return player.move_to_board(dest, 9)
-
-
 class TravelByDynofly(Event):
     once = False
     def go(self):
@@ -2712,20 +2674,6 @@ class TravelByDynofly(Event):
         triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=dyno, player_to=9)))
         return B
 
-        if dest == 'f_island':
-            B = map_to_board('f_island')
-            self.animate(dyno, 'y')
-            obj.dynofly.move_to_board(dest, Loc(0,0))
-            triggered_events.append((TravelArrival, dict(to_special=8, dest=dest, obj=dyno, player_to=9)))
-            return B
-        elif dest == 'brundle':
-            obj.dynofly.move_to_board(dest, 8)
-            return obj.player.move_to_board(dest, 9)
-        elif dest == 'dynofly':
-            obj.dynofly.move_to_board(dest, 1)
-            return obj.player.move_to_board(dest, 9)
-
-
 class EndGameEvent(Event):
     pass
 
@@ -2738,11 +2686,6 @@ class GuardAttackEvent1(Event):
             return
         guard.hostile = 1
         self.animate_arc(obj_by_attr.platform1, B.specials[5].mod_r(), carry_item=guard, height=3, sleep_time=0.01)
-
-# class PlatformEvent1(Event):
-#     once=False
-#     def go(self):
-#         B = self.B
 
 class PlatformEvent2(Event):
     once=True
