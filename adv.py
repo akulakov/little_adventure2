@@ -665,7 +665,7 @@ class Board:
         self.labels.append((10,5, "The Ferry"))
         containers, crates, doors, specials = self.load_map(self._map)
         julien = Being(self, specials[3], id=ID.julien, name='Julien', char=Blocks.elephant_l)
-        clone1 = Being(self, specials[4], id=ID.clone1, char=Blocks.elephant_l)
+        clone1 = Being(self, specials[4], id=ID.clone1, name='a Grobo', char=Blocks.elephant_l)
         clone1.inv[ID.key3] = 1
         objects[julien.id] = julien
         doors[0].type = Type.door3
@@ -2343,6 +2343,7 @@ class Quest:
     pass
 
 class MaxQuest(Quest):
+    "Disabled, fix it?"
     def go(self, player):
         max_ = obj_by_attr.max_
         if max_.state==1:
